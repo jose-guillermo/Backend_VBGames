@@ -2,8 +2,6 @@ package com.vbgames.backend.gameservice.dtos;
 
 import java.util.List;
 
-import com.vbgames.backend.common.validators.IsUUID;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
@@ -13,11 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class GameDto {
-
-    @IsUUID
-    private String id;
-
+public class GameCreateRequest {
     @NotBlank(message = "El nombre no puede estar vacio")
     private String name;
 

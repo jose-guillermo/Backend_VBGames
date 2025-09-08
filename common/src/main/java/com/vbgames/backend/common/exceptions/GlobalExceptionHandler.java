@@ -31,7 +31,7 @@ public abstract class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiError handleRuntimeException(Exception ex, HttpServletRequest request) {
         String message = "Ruta no encontrada: " + ex.getMessage();
-        return new ApiError(message, HttpStatus.INTERNAL_SERVER_ERROR, request);
+        return new ApiError(message, HttpStatus.NOT_FOUND, request);
     }
 
     @ExceptionHandler(DuplicateResourceException.class)

@@ -3,12 +3,12 @@ package com.vbgames.backend.gameservice.services;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.vbgames.backend.gameservice.dtos.GameDto;
-import com.vbgames.backend.gameservice.dtos.PieceDto;
+import com.vbgames.backend.gameservice.dtos.GameCreateRequest;
+import com.vbgames.backend.gameservice.dtos.GameResponse;
+import com.vbgames.backend.gameservice.dtos.GameUpdateRequest;
 import com.vbgames.backend.gameservice.entities.Game;
 import com.vbgames.backend.gameservice.mappers.GameMapper;
 import com.vbgames.backend.gameservice.mappers.PieceMapper;
@@ -22,51 +22,43 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class GameServiceImpl implements GameService {
 
-    @Autowired
-    private GameRepository gameRepository;
+    private final GameRepository gameRepository;
 
-    @Autowired
-    private GameMapper gameMapper;
+    private final GameMapper gameMapper;
 
-    @Autowired
-    private PieceMapper pieceMapper;
-    
+    private final PieceMapper pieceMapper;
+
     @Override
     @Transactional
-    public GameDto create(GameDto gameDto) {
+    public GameResponse create(GameCreateRequest gameDto) {
         if(gameRepository.existsByName(gameDto.getName())) 
             throw new DuplicateResourceException("El nombre '" + gameDto.getName() + "' ya existe en la tabla games");
 
-        Game game = gameRepository.save(gameMapper.toGame(gameDto));
-        List<PieceDto> piecesDto = gameDto.getPieces();
-        game.setPieces(pieceMapper.toPieces(piecesDto, game));
+        Game game = gameRepository.save(gameMapper.GameCreateRequestToGame(gameDto));
+
+        pieceMapper.addPieces(game, gameDto);
     
-        return gameMapper.toGameDto(game);
+        return gameMapper.toGameResponse(game);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<GameDto> getAll() {
+    public List<GameResponse> getAll() {
         List<Game> games = (List<Game>) gameRepository.findAll();
-        return gameMapper.toGamesDto(games);
+        return gameMapper.toGamesResponses(games);
     }
 
     @Override
     @Transactional
-    public GameDto update(GameDto gameDto, UUID id) {
+    public GameResponse update(GameUpdateRequest gameDto, UUID id) {
         Game game = gameRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Juego no encontrado"));
 
         // Si el nombre del juego es diferente al actual y existe en la base de datos lanzamos exception
         if (!gameDto.getName().equals(game.getName()) && gameRepository.existsByName(gameDto.getName())) 
             throw new DuplicateResourceException("El nombre '" + gameDto.getName() + "' ya existe en la tabla games");
 
-        game.setName(gameDto.getName());
-
-        List<PieceDto> piecesDto = gameDto.getPieces();
-        game.getPieces().clear();
-        game.getPieces().addAll(pieceMapper.toPieces(piecesDto, game));
-
-        game = gameRepository.save(game);
-        return gameMapper.toGameDto(game);
+        gameMapper.updateGame(game, gameDto);
+        pieceMapper.updatePieces(game, gameDto);
+        return gameMapper.toGameResponse(game);
     }
 }
