@@ -1,6 +1,7 @@
 package com.vbgames.backend.userservice.entities;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,12 +22,10 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "users")
 @Data
-@NoArgsConstructor
 public class User {
 
     @Id
@@ -59,10 +58,16 @@ public class User {
     )
     private List<Role> roles;
 
+    public User(){
+        this.creationDateEpoch = Instant.now().getEpochSecond();
+        this.roles = new ArrayList<>();
+    }
+
     public User(String username, String password, String email) {
         this.username = username;
         this.password = password;
         this.email = email;
         this.creationDateEpoch = Instant.now().getEpochSecond();
+        this.roles = new ArrayList<>();
     }
 }

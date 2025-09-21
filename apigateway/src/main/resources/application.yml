@@ -1,0 +1,8 @@
+server:
+    port: 8080
+
+microservices:
+    user-service:
+        url: ${USER_SERVICE_URL:http://localhost:8081}
+    game-service:
+        url: ${GAME_SERVICE_URL:http://localhost:8082}

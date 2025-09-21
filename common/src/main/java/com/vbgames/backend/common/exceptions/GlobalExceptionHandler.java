@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -54,7 +55,7 @@ public abstract class GlobalExceptionHandler {
 
     @ExceptionHandler(HandlerMethodValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError handlerRequestValidationException(HandlerMethodValidationException ex, HttpServletRequest request) {
+    public ApiError handlerMethodValidationException(HandlerMethodValidationException ex, HttpServletRequest request) {
         Map<String, String> fieldErrors = new HashMap<>();
 
         // Sacamos de la excepcion los campos y los mensajes de error de las validaciones
@@ -81,6 +82,12 @@ public abstract class GlobalExceptionHandler {
         return new ApiError(message, HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 
+    @ExceptionHandler(BadCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ApiError handlerBadCredentialsException(BadCredentialsException ex, HttpServletRequest request) {
+        return new ApiError("Error de autenticación", HttpStatus.UNAUTHORIZED, request);
+    }
+    
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiError handleException(Exception ex, HttpServletRequest request) {

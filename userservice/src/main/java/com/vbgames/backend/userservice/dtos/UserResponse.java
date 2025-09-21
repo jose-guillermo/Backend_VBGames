@@ -22,6 +22,6 @@ public class UserResponse {
     private int coins;
     private long creationDateEpoch;
     private boolean online;
-    private UUID favouriteGame;
+    private GameDto gameDto;
     private List<String> roles;
 }

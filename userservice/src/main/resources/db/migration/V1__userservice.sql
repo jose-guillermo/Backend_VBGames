@@ -1,8 +1,10 @@
+DROP TABLE IF EXISTS games CASCADE;
 CREATE TABLE games (
     id UUID PRIMARY KEY,
     name TEXT NOT NULL UNIQUE
 );
 
+DROP TABLE IF EXISTS users CASCADE;
 CREATE TABLE users (
     id UUID PRIMARY KEY,
     favourite_game UUID DEFAULT NULL,
@@ -15,12 +17,14 @@ CREATE TABLE users (
     FOREIGN KEY (favourite_game) REFERENCES games (id)
 );
 
+DROP TABLE IF EXISTS roles CASCADE;
 CREATE TABLE roles (
     id UUID PRIMARY KEY,
-    role TEXT NOT NULL UNIQUE
+    name TEXT NOT NULL UNIQUE
 );
 
-CREATE TABLE user_roles (
+DROP TABLE IF EXISTS users_roles CASCADE;
+CREATE TABLE users_roles (
     user_id UUID,
     role_id UUID,
     FOREIGN KEY (user_id) REFERENCES users (id),
@@ -28,9 +32,12 @@ CREATE TABLE user_roles (
     PRIMARY KEY (user_id, role_id)
 );
 
+DROP TABLE IF EXISTS friendships CASCADE;
 CREATE TABLE friendships (
     user_id_1 UUID,
     user_id_2 UUID,
     accepted BOOLEAN DEFAULT false,
     PRIMARY KEY (user_id_1, user_id_2)
-)
+);
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
