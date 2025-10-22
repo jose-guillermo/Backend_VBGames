@@ -31,7 +31,7 @@ services:
     networks:
       - kraft-net
     volumes:
-      - ./data:/var/lib/kafka
+      - kafka-data:/var/lib/kafka/data
 
   kafka-schema-registry:
     image: confluentinc/cp-schema-registry:7.5.0
@@ -65,6 +65,7 @@ services:
 
 volumes:
   pgdata:
+  kafka-data:
 
 networks:
   kraft-net:
