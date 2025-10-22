@@ -10,6 +10,7 @@ import com.vbgames.backend.userservice.entities.User;
 public interface UserRepository extends CrudRepository<User, UUID> {
 
     Optional<User> findByEmail(String email);
+    Optional<User> findByUsername(String email);
 
     Boolean existsByEmail(String email);
     Boolean existsByUsername(String username);

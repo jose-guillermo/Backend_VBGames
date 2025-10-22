@@ -3,6 +3,7 @@ package com.vbgames.backend.gameservice.services;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +14,7 @@ import com.vbgames.backend.gameservice.entities.Game;
 import com.vbgames.backend.gameservice.mappers.GameMapper;
 import com.vbgames.backend.gameservice.mappers.PieceMapper;
 import com.vbgames.backend.gameservice.repositories.GameRepository;
+import com.vbgames.backend.common.events.GameEvent;
 import com.vbgames.backend.common.exceptions.DuplicateResourceException;
 import com.vbgames.backend.common.exceptions.ResourceNotFoundException;
 
@@ -23,10 +25,9 @@ import lombok.RequiredArgsConstructor;
 public class GameServiceImpl implements GameService {
 
     private final GameRepository gameRepository;
-
     private final GameMapper gameMapper;
-
     private final PieceMapper pieceMapper;
+    private final KafkaTemplate<String, GameEvent> kafkaTemplate;
 
     @Override
     @Transactional
@@ -38,6 +39,7 @@ public class GameServiceImpl implements GameService {
 
         pieceMapper.addPieces(game, gameDto);
     
+        sendGameEvent(game);
         return gameMapper.toGameResponse(game);
     }
 
@@ -57,8 +59,21 @@ public class GameServiceImpl implements GameService {
         if (!gameDto.getName().equals(game.getName()) && gameRepository.existsByName(gameDto.getName())) 
             throw new DuplicateResourceException("El nombre '" + gameDto.getName() + "' ya existe en la tabla games");
 
-        gameMapper.updateGame(game, gameDto);
+        // Lanza el evento si el nombre del juego va a cambiar
+        if(!gameDto.getName().equals(game.getName())) {
+            gameMapper.updateGame(game, gameDto);
+            sendGameEvent(game);
+        }
+
         pieceMapper.updatePieces(game, gameDto);
+
         return gameMapper.toGameResponse(game);
+    }
+
+    private void sendGameEvent(Game game) {
+        GameEvent gameEvent = gameMapper.toGameEvent(game);
+
+        System.out.println("Sending game event: " + gameEvent);
+        kafkaTemplate.send("game.events", gameEvent);
     }
 }

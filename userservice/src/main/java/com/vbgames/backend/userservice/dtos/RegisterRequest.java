@@ -8,12 +8,14 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginRequest {
+public class RegisterRequest {
 
     @NotBlank(message = "El username no puede estar vacio")
-    public String email;
+    private String username;
 
-    @NotBlank(message = "La contraseña es necesaria")
-    public String password;
+    @NotBlank(message = "El email no puede estar vacio")
+    private String email;
 
+    @NotBlank(message = "El email no puede estar vacio")
+    private String password;
 }

@@ -2,20 +2,22 @@ package com.vbgames.backend.userservice.services;
 
 import java.util.UUID;
 
-import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.vbgames.backend.common.events.GameEvent;
 import com.vbgames.backend.common.exceptions.DuplicateResourceException;
 import com.vbgames.backend.common.exceptions.ResourceNotFoundException;
-import com.vbgames.backend.userservice.dtos.LoginRequest;
-import com.vbgames.backend.userservice.dtos.LoginResponse;
-import com.vbgames.backend.userservice.dtos.UserRequest;
+import com.vbgames.backend.userservice.dtos.RegisterRequest;
 import com.vbgames.backend.userservice.dtos.UserResponse;
+import com.vbgames.backend.userservice.entities.Game;
 import com.vbgames.backend.userservice.entities.Role;
 import com.vbgames.backend.userservice.entities.User;
+import com.vbgames.backend.userservice.mappers.GameMapper;
 import com.vbgames.backend.userservice.mappers.UserMapper;
+import com.vbgames.backend.userservice.repositories.GameRepository;
 import com.vbgames.backend.userservice.repositories.RoleRepository;
 import com.vbgames.backend.userservice.repositories.UserRepository;
 
@@ -26,9 +28,11 @@ import lombok.AllArgsConstructor;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final GameRepository gameRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final GameMapper gameMapper;
 
     @Override
     @Transactional(readOnly = true)
@@ -39,7 +43,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserResponse registerUser(UserRequest user) {
+    public UserResponse registerUser(RegisterRequest user) {
         if(userRepository.existsByEmail(user.getEmail())) 
             throw new DuplicateResourceException("El correo '" + user.getEmail() + "' ya existe en la tabla users");
         
@@ -58,25 +62,48 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse updateUser(UserRequest userDto) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateUser'");
+    @Transactional
+    public UserResponse updateUsername(String username, UUID userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+
+        user.setUsername(username);
+
+        return userMapper.toUserResponse(user);
     }
 
     @Override
-    public UserResponse updateFavouriteGame(UserRequest userDto) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateFavouriteGame'");
+    @Transactional
+    public UserResponse updateFavouriteGame(UUID userId, UUID gameId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+        Game game = gameRepository.findById(gameId).orElseThrow(() -> new ResourceNotFoundException("Juego no encontrado"));
+
+        user.setFavouriteGame(game);
+
+        return userMapper.toUserResponse(user);
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public LoginResponse validateCredentials(LoginRequest logingRequest) {
-        User user = userRepository.findByEmail(logingRequest.getEmail()).orElseThrow(() -> new BadCredentialsException("Usuario o contraseña incorrecto"));
-        if(!passwordEncoder.matches(logingRequest.getPassword(), user.getPassword()))
-            throw new BadCredentialsException("Usuario o contraseña incorrecto");
+    @Transactional
+    public void onlineOffline(UUID userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
-        return userMapper.toLoginResponse(user);
+        user.setOnline(!user.isOnline());
+
+    }
+
+    @KafkaListener(topics = "game.events", groupId = "user-service")
+    @Transactional
+    public void handleGameEvent(GameEvent gameEvent) {
+        try{
+            System.out.println("Received game event: " + gameEvent);
+            
+            Game game = gameMapper.toGame(gameEvent);
+            System.out.println("Game: " + game);
+            gameRepository.save(game);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     // @Transactional

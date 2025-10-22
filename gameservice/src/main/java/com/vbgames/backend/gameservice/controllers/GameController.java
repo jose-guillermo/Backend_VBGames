@@ -39,8 +39,7 @@ public class GameController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public GameResponse create(@Valid @RequestBody GameCreateRequest gameDto, BindingResult result) {
-        if (result.hasErrors())
-            validation(result);
+        validation(result);
         return gameService.create(gameDto);
     }
 
@@ -53,18 +52,19 @@ public class GameController {
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public GameResponse update(@Valid @RequestBody GameUpdateRequest gameDto, BindingResult result, @Valid @PathVariable @IsUUID String id) {
-        if (result.hasErrors())
-            validation(result);
+        validation(result);
 
         if(gameDto.getId() != null && !gameDto.getId().equals(id))
             throw new IdMismatchException("El id del juego de la url y del body no coinciden");
 
-        UUID idGame = UUID.fromString(id);
+        UUID gameId = UUID.fromString(id);
 
-        return gameService.update(gameDto, idGame);
+        return gameService.update(gameDto, gameId);
     }
-    
+
     private void validation(BindingResult result) {
+        if (!result.hasFieldErrors()) return;
+
         Map<String, String> errors = new HashMap<>();
 
         result.getFieldErrors().forEach(err -> {
@@ -74,4 +74,3 @@ public class GameController {
         throw new RequestValidationException(errors);
     }
 }
- 

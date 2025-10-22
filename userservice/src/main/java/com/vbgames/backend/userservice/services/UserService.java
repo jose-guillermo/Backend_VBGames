@@ -4,24 +4,19 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import com.vbgames.backend.userservice.dtos.LoginRequest;
-import com.vbgames.backend.userservice.dtos.LoginResponse;
-import com.vbgames.backend.userservice.dtos.UserRequest;
+import com.vbgames.backend.userservice.dtos.RegisterRequest;
 import com.vbgames.backend.userservice.dtos.UserResponse;
 
 @Service
 public interface UserService {
 
-    public UserResponse getUser(UUID username);
+    public UserResponse getUser(UUID userId);
 
-    public UserResponse registerUser(UserRequest user);
+    public UserResponse registerUser(RegisterRequest user);
 
-    public UserResponse updateUser(UserRequest userDto);
+    public UserResponse updateUsername(String username, UUID userId);
 
-    public UserResponse updateFavouriteGame(UserRequest userDto);
+    public UserResponse updateFavouriteGame(UUID userId, UUID gameId);
 
-    public LoginResponse validateCredentials(LoginRequest userDto);
-
-    
-
+    public void onlineOffline(UUID userId);
 }

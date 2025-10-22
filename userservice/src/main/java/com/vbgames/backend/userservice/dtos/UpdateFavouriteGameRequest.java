@@ -1,6 +1,6 @@
 package com.vbgames.backend.userservice.dtos;
 
-import java.util.UUID;
+import com.vbgames.backend.common.validators.IsUUID;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginResponse {
+public class UpdateFavouriteGameRequest {
 
-    UUID id;
-    String[] roles;
+    @IsUUID
+    private String gameId;
 }

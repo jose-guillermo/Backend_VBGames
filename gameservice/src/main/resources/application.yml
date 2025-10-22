@@ -6,7 +6,7 @@ spring:
         name: gameservice
 
     datasource:
-        url: jdbc:postgresql://localhost:5432/gameservice
+        url: ${DB_URL:jdbc:postgresql://localhost:5432/gameservice}
         username: ${DB_USER:dev}
         password: ${DB_PASSWORD:dev1234}
         driver-class-name: org.postgresql.Driver
@@ -22,3 +22,9 @@ spring:
             ddl-auto: none
         show-sql: true
         open-in-view: false
+
+    kafka:
+        bootstrap-servers: ${KAFKA_SERVER}
+        producer:
+            key-serializer: org.apache.kafka.common.serialization.StringSerializer
+            value-serializer: org.springframework.kafka.support.serializer.JsonSerializer

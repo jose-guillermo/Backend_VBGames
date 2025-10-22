@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class GameServiceRoutes {
 
-    @Value("${game-service.url}")
+    @Value("${microservices.game-service.url}")
     private String gameServiceUrl;
 
     @Bean

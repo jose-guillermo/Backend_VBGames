@@ -1,8 +1,14 @@
 server:
-    port: 8080
+    port: ${SERVER_PORT:8080}
 
 microservices:
     user-service:
-        url: ${USER_SERVICE_URL:http://localhost:8081}
+        url: ${USER_SERVICE_URL}
     game-service:
-        url: ${GAME_SERVICE_URL:http://localhost:8082}
+        url: ${GAME_SERVICE_URL}
+
+jwt:
+    access:
+        public: ${JWT_ACCESS_PUBLIC}
+    refresh:
+        public: ${JWT_REFRESH_PUBLIC}

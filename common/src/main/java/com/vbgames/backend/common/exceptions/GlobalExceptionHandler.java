@@ -6,7 +6,6 @@ import java.util.Map;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -80,12 +79,6 @@ public abstract class GlobalExceptionHandler {
     public ApiError handleDatabaseException(DataAccessException ex, HttpServletRequest request) {
         String message = "Error en la base de datos: " + ex.getMessage();
         return new ApiError(message, HttpStatus.INTERNAL_SERVER_ERROR, request);
-    }
-
-    @ExceptionHandler(BadCredentialsException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ApiError handlerBadCredentialsException(BadCredentialsException ex, HttpServletRequest request) {
-        return new ApiError("Error de autenticación", HttpStatus.UNAUTHORIZED, request);
     }
     
     @ExceptionHandler(Exception.class)

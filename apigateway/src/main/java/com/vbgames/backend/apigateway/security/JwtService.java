@@ -1,118 +1,72 @@
 package com.vbgames.backend.apigateway.security;
 
-import java.net.HttpCookie;
-import java.util.Date;
-import java.util.List;
-
-import javax.crypto.SecretKey;
+import java.security.KeyFactory;
+import java.security.PublicKey;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseCookie;
+import org.springframework.http.HttpCookie;
+import org.springframework.stereotype.Service;
+import org.springframework.util.MultiValueMap;
 
 import jakarta.annotation.PostConstruct;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 
-
+@Service
 public class JwtService {
 
-    @Value("${jwt.access.secret}")
-    private String secretAccess;
+    @Value("${jwt.access.public}")
+    private String publicAccess;
 
-     @Value("${jwt.refresh.secret}")
-    private String secretRefresh;
+    @Value("${jwt.refresh.public}")
+    private String publicRefresh;
 
-    private SecretKey SECRET_ACCESS_KEY;
-    private SecretKey SECRET_REFRESH_KEY;
-    private String COOKIE_REFRESH_TOKEN = "refreshToken";
-    private String COOKIE_ACCESS_TOKEN = "accessToken";
+    private PublicKey PUBLIC_ACCESS_KEY;
+    private PublicKey PUBLIC_REFRESH_KEY;
+    private final String COOKIE_REFRESH_TOKEN = "refreshToken";
+    private final String COOKIE_ACCESS_TOKEN = "accessToken";
     public static final String CONTENT_TYPE = "application/json";
 
     @PostConstruct
     public void init(){
-        SECRET_ACCESS_KEY = Keys.hmacShaKeyFor(secretAccess.getBytes());
-        SECRET_REFRESH_KEY = Keys.hmacShaKeyFor(secretRefresh.getBytes());
+        PUBLIC_ACCESS_KEY = getPublicKey(publicAccess);
+        PUBLIC_REFRESH_KEY = getPublicKey(publicRefresh);
     }
 
-    public String createAccessToken(String username, List<String> roles) {
-        Claims claims = Jwts.claims()
-            .add("authorities", roles)
-            .add("username", username)
-            .build();
-
-        return Jwts.builder()
-            .subject(username)
-            .claims(claims)
-            .expiration(new Date(System.currentTimeMillis() + (3600000 * 5)))
-            .issuedAt(new Date())
-            .signWith(SECRET_ACCESS_KEY)
-            .compact();
-    }
-
-    public String createRefreshToken(String username) {
-        return Jwts.builder()
-            .subject(username)
-            .expiration(new Date(System.currentTimeMillis() + (3600000 * 24 * 7)))
-            .issuedAt(new Date())
-            .signWith(SECRET_REFRESH_KEY)
-            .compact();
-    }
-
-    public ResponseCookie createAccessCookie(String accessToken) {
-        return ResponseCookie.from(COOKIE_ACCESS_TOKEN, accessToken)
-            .httpOnly(true)
-            .secure(true)
-            .path("/")
-            .maxAge(3600 * 5)
-            .sameSite("None")
-            // .domain("localhost")
-            .build();
-    }
-
-    public ResponseCookie createRefreshCookie(String refreshToken) {
-        return ResponseCookie.from(COOKIE_REFRESH_TOKEN, refreshToken)
-            .httpOnly(true)
-            .secure(true)
-            .path("/")
-            .maxAge(3600 * 24 * 7)
-            .sameSite("None")
-            // .domain("localhost")
-            .build();
-    }
-
-    public String getAccessToken(HttpCookie[] cookies) {
-        String token = null;
-        if(cookies != null) {
-            for (var cookie : cookies){
-                if(COOKIE_ACCESS_TOKEN.equals(cookie.getName())){
-                    token = cookie.getValue();
-                    break;
-                }
-            }
+    private PublicKey getPublicKey(String base64Key) {
+        try {
+            byte[] keyBytes = Base64.getDecoder().decode(base64Key);
+            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyBytes);
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            return keyFactory.generatePublic(keySpec);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error loading private key", e);
         }
-        return token;
     }
 
-    public String getRefreshToken(HttpCookie[] cookies) {
-        String token = null;
-        if(cookies != null) {
-            for (var cookie : cookies){
-                if(COOKIE_REFRESH_TOKEN.equals(cookie.getName())){
-                    token = cookie.getValue();
-                    break;
-                }
-            }
-        }
-        return token;
+    public String getAccessToken(MultiValueMap<String, HttpCookie> cookies) {
+        if(cookies == null) return null;
+        HttpCookie cookie = cookies.getFirst(COOKIE_ACCESS_TOKEN);
+
+        return cookie != null ? cookie.getValue() : null;
+    }
+
+    public String getRefreshToken(MultiValueMap<String, HttpCookie> cookies) {
+        if(cookies == null) return null;
+        HttpCookie cookie = cookies.getFirst(COOKIE_REFRESH_TOKEN);
+
+        return cookie != null ? cookie.getValue() : null;
     }
 
     public Claims verifyAccessToken(String token) {
-        return Jwts.parser().verifyWith(SECRET_ACCESS_KEY).build().parseSignedClaims(token).getPayload();
+        return Jwts.parser().verifyWith(PUBLIC_ACCESS_KEY).build().parseSignedClaims(token).getPayload();
     }
 
     public Claims verifyRefreshToken(String token) throws IllegalArgumentException{
-        return Jwts.parser().verifyWith(SECRET_REFRESH_KEY).build().parseSignedClaims(token).getPayload();
+        return Jwts.parser().verifyWith(PUBLIC_REFRESH_KEY).build().parseSignedClaims(token).getPayload();
     }
 }

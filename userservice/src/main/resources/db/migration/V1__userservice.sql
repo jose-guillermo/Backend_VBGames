@@ -9,7 +9,7 @@ CREATE TABLE users (
     id UUID PRIMARY KEY,
     favourite_game UUID DEFAULT NULL,
     username TEXT UNIQUE NOT NULL,
-    coins INTEGER DEFAULT 0,
+    coins INTEGER DEFAULT 100,
     password TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
     creation_date_epoch BIGINT NOT NULL,
@@ -32,12 +32,5 @@ CREATE TABLE users_roles (
     PRIMARY KEY (user_id, role_id)
 );
 
-DROP TABLE IF EXISTS friendships CASCADE;
-CREATE TABLE friendships (
-    user_id_1 UUID,
-    user_id_2 UUID,
-    accepted BOOLEAN DEFAULT false,
-    PRIMARY KEY (user_id_1, user_id_2)
-);
-
+-- Permite la creación de uuid
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";

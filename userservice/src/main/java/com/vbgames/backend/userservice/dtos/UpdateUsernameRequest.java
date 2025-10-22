@@ -6,16 +6,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class UserRequest {
+@AllArgsConstructor
+public class UpdateUsernameRequest {
 
     @NotBlank(message = "El username no puede estar vacio")
     private String username;
 
-    @NotBlank(message = "El email no puede estar vacio")
-    private String email;
-
-    @NotBlank(message = "El email no puede estar vacio")
-    private String password;
 }
