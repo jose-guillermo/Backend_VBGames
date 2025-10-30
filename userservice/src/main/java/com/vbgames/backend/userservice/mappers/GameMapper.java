@@ -9,7 +9,6 @@ import com.vbgames.backend.userservice.entities.Game;
 @Mapper(componentModel = "spring")
 public interface GameMapper {
     
-    GameDto toGameDto(Game game);
     Game toGame(GameDto gameDto);
     Game toGame(GameEvent gameEvent);
 

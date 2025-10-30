@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.vbgames.backend.common.exceptions.RequestValidationException;
 import com.vbgames.backend.common.validators.IsUUID;
 import com.vbgames.backend.userservice.dtos.RegisterRequest;
-import com.vbgames.backend.userservice.dtos.UpdateFavouriteGameRequest;
 import com.vbgames.backend.userservice.dtos.UpdateUsernameRequest;
 import com.vbgames.backend.userservice.dtos.UserResponse;
 import com.vbgames.backend.userservice.services.UserService;
@@ -40,16 +39,14 @@ public class UserController {
         return userService.getUser(UUID.fromString(id));
     }
 
-    @PatchMapping("/favourite-game")
+    @PatchMapping("/favourite-game/{gameIdString}")
     @ResponseStatus(HttpStatus.OK)
     public UserResponse updateFavouriteGame(
-        @Valid @RequestBody UpdateFavouriteGameRequest request, 
-        BindingResult result, 
+        @PathVariable @IsUUID String gameIdString,
         @RequestHeader("X-User-Id") UUID userId
     ) {
-        validation(result);
-
-        UUID gameId = UUID.fromString(request.getGameId());
+        System.out.println("gameIdString: " + gameIdString);
+        UUID gameId = UUID.fromString(gameIdString);
 
         return userService.updateFavouriteGame(userId, gameId);
     }
@@ -82,13 +79,13 @@ public class UserController {
 
     private void validation(BindingResult result) {
         if (!result.hasFieldErrors()) return;
-            
+        
         Map<String, String> errors = new HashMap<>();
-
+        
         result.getFieldErrors().forEach(err -> {
             errors.put(err.getField(), err.getDefaultMessage());
         });
-
+        
         throw new RequestValidationException(errors);
     }
 }

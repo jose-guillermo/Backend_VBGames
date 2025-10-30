@@ -40,7 +40,7 @@ public class User {
     private String email;
     private int coins;
 
-    @Column(name = "creation_date_epoch")
+    @Column(name = "created_at")
     private long creationDateEpoch;
     private boolean online;
     

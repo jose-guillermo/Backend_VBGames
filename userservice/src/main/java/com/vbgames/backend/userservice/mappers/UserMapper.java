@@ -3,6 +3,7 @@ package com.vbgames.backend.userservice.mappers;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import com.vbgames.backend.common.events.UserEvent;
 import com.vbgames.backend.userservice.dtos.RegisterRequest;
 import com.vbgames.backend.userservice.dtos.UserResponse;
 import com.vbgames.backend.userservice.entities.Role;
@@ -24,6 +25,8 @@ public interface UserMapper {
     default String mapRoleToString(Role role) {
         return role.getName();
     }
+
+    UserEvent toUserEvent(User user);
 
     default void addRole(User user, Role role) {
         user.getRoles().add(role);

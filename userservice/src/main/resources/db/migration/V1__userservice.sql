@@ -12,7 +12,7 @@ CREATE TABLE users (
     coins INTEGER DEFAULT 100,
     password TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
-    creation_date_epoch BIGINT NOT NULL,
+    created_at BIGINT NOT NULL,
     online BOOLEAN DEFAULT false,
     FOREIGN KEY (favourite_game) REFERENCES games (id)
 );
@@ -27,8 +27,8 @@ DROP TABLE IF EXISTS users_roles CASCADE;
 CREATE TABLE users_roles (
     user_id UUID,
     role_id UUID,
-    FOREIGN KEY (user_id) REFERENCES users (id),
-    FOREIGN KEY (role_id) REFERENCES roles (id),
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    FOREIGN KEY (role_id) REFERENCES roles (id) ON DELETE CASCADE,
     PRIMARY KEY (user_id, role_id)
 );
 

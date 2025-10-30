@@ -25,8 +25,6 @@ spring:
     
     kafka: 
         bootstrap-servers: ${KAFKA_SERVER}
-        template:
-            default-topic: game.events 
         consumer:
             auto-offset-reset: earliest
             group-id: user-service
@@ -40,6 +38,9 @@ spring:
                                 type: com.vbgames.backend.common.events.GameEvent
                         trusted:
                             packages: "*"
+        producer:
+            key-serializer: org.apache.kafka.common.serialization.StringSerializer
+            value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
 jwt:
     access:

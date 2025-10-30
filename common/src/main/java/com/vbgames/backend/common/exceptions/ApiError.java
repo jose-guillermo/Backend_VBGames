@@ -36,7 +36,7 @@ public class ApiError {
         this.requestMethod = request.getMethod();
     }
 
-    public ApiError(String message,Map<String, String> fieldErrors, HttpStatus status, HttpServletRequest request) {
+    public ApiError(String message, Map<String, String> fieldErrors, HttpStatus status, HttpServletRequest request) {
         this.timestamp = LocalDateTime.now();
         this.message = message;
         this.statusCode = status.value();

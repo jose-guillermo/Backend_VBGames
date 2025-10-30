@@ -6,6 +6,8 @@ microservices:
         url: ${USER_SERVICE_URL}
     game-service:
         url: ${GAME_SERVICE_URL}
+    friendship-service:
+        url: ${FRIENDSHIP_SERVICE_URL}
 
 jwt:
     access:
