@@ -10,8 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserEvent {
-
     private UUID id;
     private String username;
-
+    private int coins;
 }

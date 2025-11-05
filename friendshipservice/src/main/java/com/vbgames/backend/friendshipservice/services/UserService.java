@@ -18,7 +18,7 @@ public class UserService {
     private final UserMapper userMapper;
     private final UserRepository userRepository;
 
-    @KafkaListener(topics = "user.events", groupId = "friendship-service")
+    @KafkaListener(topics = "user.events")
     @Transactional
     public void handleUserEvent(UserEvent userEvent) {
         User user = userMapper.toUser(userEvent);

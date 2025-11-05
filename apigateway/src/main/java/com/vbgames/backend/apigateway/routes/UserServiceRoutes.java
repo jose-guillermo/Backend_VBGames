@@ -16,7 +16,7 @@ public class UserServiceRoutes {
     RouteLocator userRoutes(RouteLocatorBuilder builder) {
         return builder.routes()
                 .route(r -> r
-                    .path("/user-service/**")
+                    .path("/users/**")
                     .uri(userServiceUrl)
                 )
                 .route(r -> r

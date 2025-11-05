@@ -16,7 +16,7 @@ public class FriendshipServiceRoutes {
     RouteLocator friendshipRoutes(RouteLocatorBuilder builder) {
         return builder.routes()
                 .route(r -> r
-                    .path("/friendship-service/**")
+                    .path("/friendships/**")
                     .uri(friendshipServiceUrl)
                 )
                 .build();

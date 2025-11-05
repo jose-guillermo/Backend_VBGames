@@ -1,6 +1,7 @@
 package com.vbgames.backend.userservice.dtos;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,7 +11,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UpdateUsernameRequest {
 
-    @NotBlank(message = "El username no puede estar vacio")
+    @Size(min = 4, max = 20, message = "El nombre de usuario debe tener entre 4 y 20 caracteres")
+    @NotNull(message = "El username es obligatorio")
     private String username;
 
 }

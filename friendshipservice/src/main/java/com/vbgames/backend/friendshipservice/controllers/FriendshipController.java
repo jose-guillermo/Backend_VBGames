@@ -13,7 +13,7 @@ import java.util.UUID;
 import org.springframework.http.HttpStatus;
 
 import com.vbgames.backend.common.validators.IsUUID;
-import com.vbgames.backend.friendshipservice.dtos.FriendDto;
+import com.vbgames.backend.friendshipservice.dtos.FriendResponse;
 import com.vbgames.backend.friendshipservice.services.FriendshipService;
 
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 
 @RestController
-@RequestMapping("/friendship-service")
+@RequestMapping("/friendships")
 @RequiredArgsConstructor
 public class FriendshipController {
 
@@ -31,7 +31,7 @@ public class FriendshipController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public ArrayList<FriendDto> getFriends(@RequestHeader("X-User-Id") UUID userId) {
+    public ArrayList<FriendResponse> getFriends(@RequestHeader("X-User-Id") UUID userId) {
         return friendshipService.getFriends(userId);
     }
 
@@ -52,5 +52,4 @@ public class FriendshipController {
     public void acceptFriendship(@RequestHeader("X-User-Id") UUID userId, @PathVariable @IsUUID String friendId) {
         friendshipService.acceptFriendship(userId, UUID.fromString(friendId));
     }
-
 }

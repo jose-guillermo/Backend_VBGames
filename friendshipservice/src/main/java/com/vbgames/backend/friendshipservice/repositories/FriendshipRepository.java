@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
-import com.vbgames.backend.friendshipservice.dtos.FriendDto;
+import com.vbgames.backend.friendshipservice.dtos.FriendResponse;
 import com.vbgames.backend.friendshipservice.entities.Friendship;
 import com.vbgames.backend.friendshipservice.entities.FriendshipId;
 
@@ -31,7 +31,7 @@ public interface FriendshipRepository extends CrudRepository<Friendship, Friends
         """,
         nativeQuery = true
     )
-    List<FriendDto> findAllFriendsByUserId(@Param("userId") UUID userId);
+    List<FriendResponse> findAllFriendsByUserId(@Param("userId") UUID userId);
     
     @Modifying
     @Query(value = """

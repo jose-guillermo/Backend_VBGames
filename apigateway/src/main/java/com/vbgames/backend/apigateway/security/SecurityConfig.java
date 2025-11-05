@@ -22,11 +22,12 @@ public class SecurityConfig {
         return http
             .authorizeExchange(auth -> auth
                 // Rutas públicas
-                .pathMatchers(HttpMethod.POST,"login", "refresh", "user-service").permitAll()
-                .pathMatchers(HttpMethod.GET,"game-service").permitAll()
+                .pathMatchers(HttpMethod.POST,"login", "refresh", "users").permitAll()
+                .pathMatchers(HttpMethod.GET,"games").permitAll()
                 // Rutas solo para el admin
-                .pathMatchers(HttpMethod.POST,"game-service").hasRole("ADMIN")
-                .pathMatchers(HttpMethod.PUT,"game-service/*").hasRole("ADMIN")
+                .pathMatchers(HttpMethod.POST,"games").hasRole("ADMIN")
+                .pathMatchers(HttpMethod.PUT,"games/*").hasRole("ADMIN")
+                .pathMatchers(HttpMethod.POST,"products/*").hasRole("ADMIN")
 
                 .anyExchange().authenticated()
             )

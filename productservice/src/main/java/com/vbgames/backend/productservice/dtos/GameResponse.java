@@ -1,4 +1,4 @@
-package com.vbgames.backend.friendshipservice.dtos;
+package com.vbgames.backend.productservice.dtos;
 
 import java.util.UUID;
 
@@ -7,10 +7,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class FriendDto {
+@AllArgsConstructor
+public class GameResponse {
     private UUID id;
-    private Boolean accepted;
-    private String username;
+    private String name;
 }

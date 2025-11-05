@@ -13,6 +13,7 @@ import com.vbgames.backend.userservice.dtos.RegisterRequest;
 import com.vbgames.backend.userservice.dtos.UpdateUsernameRequest;
 import com.vbgames.backend.userservice.dtos.UserResponse;
 import com.vbgames.backend.userservice.services.UserService;
+import com.vbgames.backend.userservice.validators.ConfirmPassword;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @RestController
-@RequestMapping("/user-service")
+@RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -51,7 +52,7 @@ public class UserController {
         return userService.updateFavouriteGame(userId, gameId);
     }
 
-    @PatchMapping("/update-username")
+    @PatchMapping("/username")
     @ResponseStatus(HttpStatus.OK)
     public UserResponse updateUsername(
         @Valid @RequestBody UpdateUsernameRequest request, 
@@ -71,8 +72,8 @@ public class UserController {
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    public UserResponse registerUser(@Valid @RequestBody RegisterRequest request, BindingResult result) {
-        validation(result); 
+    public UserResponse registerUser(@Valid @RequestBody @ConfirmPassword RegisterRequest request, BindingResult result) {
+        validation(result);
 
         return userService.registerUser(request);
     }

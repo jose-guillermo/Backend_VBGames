@@ -33,11 +33,8 @@ spring:
             properties:
                 spring:
                     json:
-                        value:
-                            default:
-                                type: com.vbgames.backend.common.events.GameEvent
                         trusted:
-                            packages: "*"
+                            packages: "com.vbgames.backend.common.events"
         producer:
             key-serializer: org.apache.kafka.common.serialization.StringSerializer
             value-serializer: org.springframework.kafka.support.serializer.JsonSerializer

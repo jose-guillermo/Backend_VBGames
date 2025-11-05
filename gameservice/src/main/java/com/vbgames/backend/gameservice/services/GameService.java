@@ -11,6 +11,7 @@ import com.vbgames.backend.gameservice.dtos.GameCreateRequest;
 import com.vbgames.backend.gameservice.dtos.GameResponse;
 import com.vbgames.backend.gameservice.dtos.GameUpdateRequest;
 import com.vbgames.backend.gameservice.entities.Game;
+import com.vbgames.backend.gameservice.entities.Piece;
 import com.vbgames.backend.gameservice.mappers.GameMapper;
 import com.vbgames.backend.gameservice.mappers.PieceMapper;
 import com.vbgames.backend.gameservice.repositories.GameRepository;
@@ -36,7 +37,9 @@ public class GameService{
 
         Game game = gameRepository.save(gameMapper.GameCreateRequestToGame(gameDto));
 
-        pieceMapper.addPieces(game, gameDto);
+        List<Piece> pieces = pieceMapper.toPieces(gameDto.getPieces(), game);
+
+        game.setPieces(pieces);
     
         sendGameEvent(game);
         return gameMapper.toGameResponse(game);
@@ -62,7 +65,7 @@ public class GameService{
             sendGameEvent(game);
         }
 
-        pieceMapper.updatePieces(game, gameDto);
+        pieceMapper.updatePieces(game, gameDto); 
 
         return gameMapper.toGameResponse(game);
     }

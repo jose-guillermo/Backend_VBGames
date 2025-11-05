@@ -18,6 +18,6 @@ public class UserResponse {
     private int coins;
     private long creationDateEpoch;
     private boolean online;
-    private GameDto favouriteGame;
+    private GameResponse favouriteGame;
     private List<String> roles;
 }

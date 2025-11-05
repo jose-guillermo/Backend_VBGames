@@ -3,8 +3,6 @@ package com.vbgames.backend.userservice.entities;
 import java.util.List;
 import java.util.UUID;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
@@ -26,7 +24,7 @@ public class Role {
     private String name;
 
     @ManyToMany(mappedBy = "roles")
-    @JsonIgnoreProperties({"roles", "handler", "hibernateLazyInitializer"})
-    private List<User> user;
+    // @JsonIgnoreProperties({"roles", "handler", "hibernateLazyInitializer"})
+    private List<User> users;
 
 }

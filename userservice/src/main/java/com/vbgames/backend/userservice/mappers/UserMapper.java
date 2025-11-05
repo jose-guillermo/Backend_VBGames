@@ -1,8 +1,10 @@
 package com.vbgames.backend.userservice.mappers;
 
+import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import com.vbgames.backend.common.events.UpdateCoinsEvent;
 import com.vbgames.backend.common.events.UserEvent;
 import com.vbgames.backend.userservice.dtos.RegisterRequest;
 import com.vbgames.backend.userservice.dtos.UserResponse;
@@ -20,15 +22,16 @@ public interface UserMapper {
     @Mapping(target = "creationDateEpoch", ignore = true)
     User toUser(RegisterRequest userDto);
 
-    UserResponse toUserResponse(User user);
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "coins", source = "coins")
+    User toUser(UpdateCoinsEvent updateCoinsEvent);
 
-    default String mapRoleToString(Role role) {
-        return role.getName();
-    }
+    UserResponse toUserResponse(User user);
 
     UserEvent toUserEvent(User user);
 
-    default void addRole(User user, Role role) {
-        user.getRoles().add(role);
+    default String mapRoleToString(Role role) {
+        return role.getName();
     }
 }

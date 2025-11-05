@@ -1,6 +1,9 @@
 package com.vbgames.backend.userservice.dtos;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,12 +13,24 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class RegisterRequest {
 
-    @NotBlank(message = "El username no puede estar vacio")
+    @Size(min = 4, max = 20, message = "El nombre de usuario debe tener entre 4 y 20 caracteres")
+    @NotNull(message = "El username es obligatorio")
     private String username;
 
-    @NotBlank(message = "El email no puede estar vacio")
+    @Pattern(
+        regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$",
+        message = "Debe ser una dirección de correo electrónico válida"
+    )
+    @NotNull(message = "El email no puede estar vacio")
     private String email;
 
-    @NotBlank(message = "El email no puede estar vacio")
+    @Pattern(
+        regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{6,}$",
+        message = "La contraseña debe tener al menos una minúscula, una mayúscula, un número y mínimo 8 caracteres"
+    )
+    @NotNull(message = "La contraseña es obligatoria")
     private String password;
+
+    @NotBlank(message = "Confirmar la contraseña es obligatorio")
+    private String confirmPassword;
 }

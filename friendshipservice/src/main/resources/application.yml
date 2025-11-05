@@ -34,9 +34,6 @@ spring:
             properties:
                 spring:
                     json:
-                        value:
-                            default:
-                                type: com.vbgames.backend.common.events.UserEvent
                         trusted:
-                            packages: "*"
+                            packages: "com.vbgames.backend.common.events"
     

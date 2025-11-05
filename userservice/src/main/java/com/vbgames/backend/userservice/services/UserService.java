@@ -2,11 +2,13 @@ package com.vbgames.backend.userservice.services;
 
 import java.util.UUID;
 
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.vbgames.backend.common.events.UpdateCoinsEvent;
 import com.vbgames.backend.common.events.UserEvent;
 import com.vbgames.backend.common.exceptions.DuplicateResourceException;
 import com.vbgames.backend.common.exceptions.ResourceNotFoundException;
@@ -49,11 +51,12 @@ public class UserService {
 
         // Hashcodear la contraseña
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setEmail(user.getEmail().toLowerCase());
 
         User newUser = userRepository.save(userMapper.toUser(user));
         Role userRole = roleRepository.findByName("ROLE_USER").get();
 
-        userMapper.addRole(newUser, userRole);
+        newUser.getRoles().add(userRole);
 
         sendUserEvent(newUser);
 
@@ -89,15 +92,16 @@ public class UserService {
 
     }
 
-    // @Transactional
-    // public User getUser(String username) {
-    //     return userRepository.findByUsername(username);
-    // }
+    @KafkaListener(topics = "user.coins.events")
+    @Transactional
+    public void handleUpdateCoinsEvent(UpdateCoinsEvent updateCoinsEvent) {
+        User user = userMapper.toUser(updateCoinsEvent);
+
+        userRepository.save(user);
+    }
 
     private void sendUserEvent(User user) {
         UserEvent userEvent = userMapper.toUserEvent(user);
-
-        System.out.println("Sending user event: " + userEvent);
 
         kafkaTemplate.send("user.events", userEvent);
     }

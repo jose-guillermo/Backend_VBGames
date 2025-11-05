@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vbgames.backend.common.exceptions.ResourceNotFoundException;
-import com.vbgames.backend.friendshipservice.dtos.FriendDto;
+import com.vbgames.backend.friendshipservice.dtos.FriendResponse;
 import com.vbgames.backend.friendshipservice.entities.Friendship;
 import com.vbgames.backend.friendshipservice.entities.User;
 import com.vbgames.backend.friendshipservice.exceptions.DuplicateFriendshipException;
@@ -25,8 +25,8 @@ public class FriendshipService {
     private final FriendshipRepository friendshipRepository;
 
     @Transactional(readOnly = true)
-    public ArrayList<FriendDto> getFriends(UUID userId) {
-        return new ArrayList<FriendDto>(friendshipRepository.findAllFriendsByUserId(userId));
+    public ArrayList<FriendResponse> getFriends(UUID userId) {
+        return new ArrayList<FriendResponse>(friendshipRepository.findAllFriendsByUserId(userId));
     }
 
     @Transactional

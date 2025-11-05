@@ -8,7 +8,6 @@ import java.util.UUID;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.CascadeType;
@@ -50,7 +49,6 @@ public class User {
     
     @ManyToMany(cascade = CascadeType.REMOVE)
     // @JsonIgnoreProperties({"users", "handler", "hibernateLazyInitializer"})
-    @JsonIgnoreProperties({"users"})
     @JoinTable(
         name = "users_roles",
         joinColumns = @JoinColumn(name = "user_id"),

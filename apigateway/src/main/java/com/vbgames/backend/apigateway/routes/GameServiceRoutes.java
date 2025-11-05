@@ -16,7 +16,7 @@ public class GameServiceRoutes {
     RouteLocator gameRoutes(RouteLocatorBuilder builder) {
         return builder.routes()
                 .route(r -> r
-                    .path("/game-service/**")
+                    .path("/games/**")
                     .uri(gameServiceUrl)
                 )
                 .build();

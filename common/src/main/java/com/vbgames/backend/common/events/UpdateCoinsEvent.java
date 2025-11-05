@@ -1,4 +1,4 @@
-package com.vbgames.backend.userservice.dtos;
+package com.vbgames.backend.common.events;
 
 import java.util.UUID;
 
@@ -7,10 +7,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class GameDto {
-    private UUID id;
-    private String name;
+@AllArgsConstructor
+public class UpdateCoinsEvent {
 
+    private UUID id;
+    private int coins;
 }
