@@ -10,6 +10,8 @@ microservices:
         url: ${FRIENDSHIP_SERVICE_URL}
     product-service:
         url: ${PRODUCT_SERVICE_URL}
+    message-service:
+        url: ${MESSAGE_SERVICE_URL}
 
 jwt:
     access:

@@ -52,7 +52,7 @@ public class UserController {
         return userService.updateFavouriteGame(userId, gameId);
     }
 
-    @PatchMapping("/username")
+    @PatchMapping("/update-username")
     @ResponseStatus(HttpStatus.OK)
     public UserResponse updateUsername(
         @Valid @RequestBody UpdateUsernameRequest request, 

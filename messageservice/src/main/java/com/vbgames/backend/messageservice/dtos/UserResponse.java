@@ -1,4 +1,4 @@
-package com.vbgames.backend.common.events;
+package com.vbgames.backend.messageservice.dtos;
 
 import java.util.UUID;
 
@@ -9,7 +9,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateCoinsEvent {
+public class UserResponse {
+
     private UUID id;
-    private int coins;
+    private String username;
+
 }

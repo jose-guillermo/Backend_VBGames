@@ -18,7 +18,7 @@ public class GameService {
     private final GameMapper gameMapper;
     private final GameRepository gameRepository;
 
-    @KafkaListener(topics = "game.events", groupId = "user-service")
+    @KafkaListener(topics = "game.events")
     @Transactional
     public void handleGameEvent(GameEvent gameEvent) {
         Game game = gameMapper.toGame(gameEvent);

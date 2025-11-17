@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestControllerAdvice
@@ -71,7 +74,36 @@ public abstract class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleHttpMessageNotReadableException(HttpMessageNotReadableException ex, HttpServletRequest request) {
-        return new ApiError("El cuerpo de la petición es obligatorio y no puede estar vacío.", HttpStatus.BAD_REQUEST, request);
+        
+        Throwable cause = ex.getMostSpecificCause();
+
+        // Enum inválido
+        if (cause instanceof InvalidFormatException)
+            return new ApiError(
+                "Se ha enviado un valor no válido para un campo enumerado.",
+                HttpStatus.BAD_REQUEST,
+                request
+            );
+
+        // JSON mal formado
+        if (cause instanceof JsonParseException)
+            return new ApiError(
+                "El cuerpo de la petición tiene un formato JSON inválido.",
+                HttpStatus.BAD_REQUEST,
+                request
+            );
+        
+        return new ApiError(
+            "No se ha podido interpretar el cuerpo de la petición.",
+            HttpStatus.BAD_REQUEST,
+            request
+        );
+    }
+
+    @ExceptionHandler(ForbiddenActionException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ApiError handlerForbiddenActionException(ForbiddenActionException ex, HttpServletRequest request) {
+        return new ApiError(ex.getMessage(), HttpStatus.FORBIDDEN, request);
     }
 
     @ExceptionHandler(DataAccessException.class)

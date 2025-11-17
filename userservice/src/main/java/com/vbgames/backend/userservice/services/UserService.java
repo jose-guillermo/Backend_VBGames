@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.vbgames.backend.common.enums.UserEventType;
 import com.vbgames.backend.common.events.UpdateCoinsEvent;
 import com.vbgames.backend.common.events.UserEvent;
 import com.vbgames.backend.common.exceptions.DuplicateResourceException;
@@ -22,10 +23,10 @@ import com.vbgames.backend.userservice.repositories.GameRepository;
 import com.vbgames.backend.userservice.repositories.RoleRepository;
 import com.vbgames.backend.userservice.repositories.UserRepository;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
@@ -58,7 +59,7 @@ public class UserService {
 
         newUser.getRoles().add(userRole);
 
-        sendUserEvent(newUser);
+        sendUserEvent(newUser, UserEventType.CREATED);
 
         return userMapper.toUserResponse(newUser);
     }
@@ -69,7 +70,7 @@ public class UserService {
 
         user.setUsername(username);
 
-        sendUserEvent(user);
+        sendUserEvent(user, UserEventType.UPDATED);
 
         return userMapper.toUserResponse(user);
     }
@@ -92,16 +93,15 @@ public class UserService {
 
     }
 
-    @KafkaListener(topics = "user.coins.events")
+    @KafkaListener(topics = "user.coins.updated")
     @Transactional
     public void handleUpdateCoinsEvent(UpdateCoinsEvent updateCoinsEvent) {
-        User user = userMapper.toUser(updateCoinsEvent);
-
-        userRepository.save(user);
+        userRepository.findById(updateCoinsEvent.getId())
+            .ifPresent(user -> user.setCoins(updateCoinsEvent.getCoins()));
     }
 
-    private void sendUserEvent(User user) {
-        UserEvent userEvent = userMapper.toUserEvent(user);
+    private void sendUserEvent(User user, UserEventType type) {
+        UserEvent userEvent = userMapper.toUserEvent(user, type);
 
         kafkaTemplate.send("user.events", userEvent);
     }

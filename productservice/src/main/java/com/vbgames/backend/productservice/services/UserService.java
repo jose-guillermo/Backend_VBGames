@@ -30,9 +30,11 @@ public class UserService {
     @KafkaListener(topics = "user.events")
     @Transactional
     public void handleUserEvent(UserEvent userEvent) {
-        User user = userMapper.toUser(userEvent);
-
-        userRepository.save(user);
+        userRepository.findById(userEvent.getId())
+            .ifPresentOrElse(
+                existingUser -> existingUser.setUsername(userEvent.getUsername()),
+                () -> userRepository.save(userMapper.toUser(userEvent))
+            );
     }
 
     @Transactional
@@ -57,7 +59,7 @@ public class UserService {
 
     private void sendUpdateCoinsEvent(User user) {
         UpdateCoinsEvent updateCoinsEvent = userMapper.toUpdateCoinsEvent(user);
-        kafkaTemplate.send("user.coins.events", updateCoinsEvent);
+        kafkaTemplate.send("user.coins.updated", updateCoinsEvent);
     }
 
 }

@@ -3,8 +3,8 @@ server:
 
 spring:
     application:
-        name: friendshipservice
-    
+        name: messageservice
+
     datasource:
         url: ${DB_URL}
         username: ${DB_USER}
@@ -23,12 +23,11 @@ spring:
         show-sql: true
         open-in-view: false
 
-    kafka: 
+    kafka:
         bootstrap-servers: ${KAFKA_SERVER}
-        template:
-            default-topic: user.events 
         consumer:
-            group-id: friendship-service
+            auto-offset-reset: earliest
+            group-id: message-service
             key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
             value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
             properties:
@@ -36,7 +35,3 @@ spring:
                     json:
                         trusted:
                             packages: "com.vbgames.backend.common.events"
-        producer:
-            key-serializer: org.apache.kafka.common.serialization.StringSerializer
-            value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-    

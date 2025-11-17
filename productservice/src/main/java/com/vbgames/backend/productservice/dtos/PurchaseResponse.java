@@ -8,8 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PurchaseResponse {
-
     private ProductResponse product;
     private int userCoins;
-
 }

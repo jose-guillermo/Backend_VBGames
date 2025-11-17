@@ -6,16 +6,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "friendships")
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class Friendship {
 
@@ -37,9 +34,11 @@ public class Friendship {
     @Column(name = "created_at")
     private long createdAt;
 
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = System.currentTimeMillis();
+    public Friendship(User user, User friend) {
+        this.user = user;
+        this.friend = friend;
+        this.id = new FriendshipId(user.getId(), friend.getId());
         this.accepted = false;
+        this.createdAt = System.currentTimeMillis();
     }
 }

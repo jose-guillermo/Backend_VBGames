@@ -12,7 +12,7 @@ CREATE TABLE users (
     id UUID PRIMARY KEY,
     favourite_game UUID DEFAULT NULL,
     username TEXT UNIQUE NOT NULL,
-    coins INTEGER DEFAULT 100,
+    coins INTEGER DEFAULT 0,
     password TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
     created_at BIGINT NOT NULL,

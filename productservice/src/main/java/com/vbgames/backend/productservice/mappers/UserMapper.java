@@ -11,6 +11,7 @@ import com.vbgames.backend.productservice.entities.User;
 public interface UserMapper {
 
     @Mapping(target = "products", ignore = true)
+    @Mapping(target = "coins", ignore = true)
     User toUser(UserEvent userRequest);
 
     @Mapping(target = "products", ignore = true)

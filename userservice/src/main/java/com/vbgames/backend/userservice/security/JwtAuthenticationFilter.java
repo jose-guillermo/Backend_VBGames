@@ -9,14 +9,14 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.fasterxml.jackson.core.exc.StreamReadException;
-import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vbgames.backend.common.exceptions.ApiError;
 import com.vbgames.backend.userservice.entities.User;
@@ -40,23 +40,25 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException {
         User user = null;
-        String email = null;
-        String password = null;
 
         try {
             user = new ObjectMapper().readValue(request.getInputStream(), User.class);
-            email = user.getEmail().toLowerCase();
-            password = user.getPassword();
-        } catch (StreamReadException e) {
-            e.printStackTrace();
-        } catch (DatabindException e) {
-            e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new AuthenticationServiceException("Formato de usuario incorrecto", e);
         }
 
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
+        if(user == null || user.getEmail() == null || user.getPassword() == null)
+            throw new AuthenticationServiceException("Formato de usuario incorrecto");
+        
+        String email = user.getEmail().toLowerCase();
+        String password = user.getPassword();
 
+
+        if(email.equals("system@internal.local"))
+            throw new BadCredentialsException("Este usuario no puede iniciar sesión");
+        
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
+        
         return authenticationManager.authenticate(authenticationToken);
     }
 

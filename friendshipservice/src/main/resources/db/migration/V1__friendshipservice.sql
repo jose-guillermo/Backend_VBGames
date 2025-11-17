@@ -9,8 +9,8 @@ CREATE TABLE users (
 CREATE TABLE friendships (
     user_id_1 UUID,
     user_id_2 UUID,
-    accepted BOOLEAN DEFAULT false,
-    created_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW())::BIGINT,
+    accepted BOOLEAN NOT NULL,
+    created_at BIGINT NOT NULL,
 
     PRIMARY KEY (user_id_1, user_id_2),
     FOREIGN KEY (user_id_1) REFERENCES users (id) ON DELETE CASCADE,

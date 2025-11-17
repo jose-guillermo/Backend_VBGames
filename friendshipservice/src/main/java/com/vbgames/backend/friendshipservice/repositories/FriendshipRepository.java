@@ -8,11 +8,13 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import com.vbgames.backend.friendshipservice.dtos.FriendResponse;
 import com.vbgames.backend.friendshipservice.entities.Friendship;
 import com.vbgames.backend.friendshipservice.entities.FriendshipId;
 
+@Repository
 public interface FriendshipRepository extends CrudRepository<Friendship, FriendshipId> {
 
     @Query(
@@ -41,7 +43,7 @@ public interface FriendshipRepository extends CrudRepository<Friendship, Friends
         """, 
         nativeQuery = true
     )
-    int deleteByUserAndFriend(@Param("userId") UUID userId, @Param("friendId") UUID friendId);
+    int deleteByUserIdAndFriendId(@Param("userId") UUID userId, @Param("friendId") UUID friendId);
 
     @Query(value = """
         SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END
@@ -54,5 +56,9 @@ public interface FriendshipRepository extends CrudRepository<Friendship, Friends
     Boolean existsByUsers(UUID user1Id, UUID user2Id);
 
     Optional<Friendship> findByUserIdAndFriendId(UUID userId, UUID friendId);
+
+    @Modifying
+    @Query(value = "DELETE FROM friendships WHERE accepted = false AND created_at < :timestamp", nativeQuery = true)
+    void deleteExpiredFriendships(long timestamp);
 }
     

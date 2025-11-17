@@ -1,4 +1,4 @@
-package com.vbgames.backend.userservice.entities;
+package com.vbgames.backend.messageservice.entities;
 
 import java.util.UUID;
 
@@ -10,13 +10,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "games")
+@Table(name = "users")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Game {
+public class User {
 
     @Id
     private UUID id;
-    private String name;
+
+    private String username;
 }
