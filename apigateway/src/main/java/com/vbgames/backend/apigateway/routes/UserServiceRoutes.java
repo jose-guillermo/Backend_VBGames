@@ -15,18 +15,18 @@ public class UserServiceRoutes {
     @Bean
     RouteLocator userRoutes(RouteLocatorBuilder builder) {
         return builder.routes()
-                .route(r -> r
-                    .path("/users/**")
-                    .uri(userServiceUrl)
-                )
-                .route(r -> r
-                    .path("/login")
-                    .uri(userServiceUrl)
-                )
-                .route(r -> r
-                    .path("/refresh")
-                    .uri(userServiceUrl)
-                )
-                .build();
+            .route(r -> r
+                .path("/users/**")
+                .uri(userServiceUrl)
+            )
+            // .route(r -> r
+            //     .path("/login")
+            //     .uri(userServiceUrl)
+            // )
+            // .route(r -> r
+            //     .path("/refresh")
+            //     .uri(userServiceUrl)
+            // )
+            .build();
     }
 }

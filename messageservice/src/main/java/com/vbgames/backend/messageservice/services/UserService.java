@@ -6,7 +6,8 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.vbgames.backend.common.events.UserEvent;
+import com.vbgames.backend.common.events.UserCreatedEvent;
+import com.vbgames.backend.common.events.UsernameUpdatedEvent;
 import com.vbgames.backend.messageservice.dtos.SendMessageRequest;
 import com.vbgames.backend.messageservice.entities.User;
 import com.vbgames.backend.messageservice.enums.MessageType;
@@ -32,22 +33,26 @@ public class UserService {
             .getId();
     }
 
-    @KafkaListener(topics = "user.events")
+    @KafkaListener(topics = "user.created")
     @Transactional
-    public void handleUserEvent(UserEvent userEvent) {
-        User user = userMapper.toUser(userEvent);
+    public void handleUserEvent(UserCreatedEvent event) {
+        User user = userMapper.toUser(event);
 
-        switch (userEvent.getType()) {
-            case UPDATED -> userRepository.save(user);
-            case CREATED -> {
-                User newUser = userRepository.save(user);
-                SendMessageRequest request = new SendMessageRequest(
-                    "MESSAGES.WELCOMING_MESSAGE.TITLE",
-                    "MESSAGES.WELCOMING_MESSAGE.BODY",
-                    MessageType.SYSTEM_NOTIFICATION
-                );
-                messageService.sendMessage(this.systemUserId, newUser.getId(), request);
-            }
-        }
+        User newUser = userRepository.save(user);
+        SendMessageRequest request = new SendMessageRequest(
+            "MESSAGES.WELCOMING_MESSAGE.TITLE",
+            "MESSAGES.WELCOMING_MESSAGE.BODY",
+            MessageType.SYSTEM_NOTIFICATION
+        );
+        
+        messageService.sendMessage(this.systemUserId, newUser.getId(), request);
+    }
+
+    @KafkaListener(topics = "username.updated")
+    @Transactional
+    public void handleUserEvent(UsernameUpdatedEvent event) {
+        User user = userMapper.toUser(event);
+        
+        userRepository.save(user);
     }
 }

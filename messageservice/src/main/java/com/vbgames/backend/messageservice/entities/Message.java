@@ -1,5 +1,6 @@
 package com.vbgames.backend.messageservice.entities;
 
+import java.time.Instant;
 import java.util.UUID;
 
 import org.hibernate.annotations.JdbcTypeCode;
@@ -31,7 +32,7 @@ public class Message {
     private UUID id;
 
     @Column(name = "send_date")
-    private long sendDate = System.currentTimeMillis();
+    private long sendDate = Instant.now().toEpochMilli();
 
     @Column(name = "is_read")
     private boolean read = false;

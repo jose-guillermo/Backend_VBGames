@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import com.vbgames.backend.common.events.GameEvent;
+import com.vbgames.backend.common.events.GameUpsertedEvent;
 import com.vbgames.backend.gameservice.dtos.GameCreateRequest;
 import com.vbgames.backend.gameservice.dtos.GameResponse;
 import com.vbgames.backend.gameservice.dtos.GameUpdateRequest;
@@ -23,7 +23,7 @@ public interface GameMapper {
 
     List<GameResponse> toGamesResponses(List<Game> games);
 
-    GameEvent toGameEvent(Game game);
+    GameUpsertedEvent toGameEvent(Game game);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "pieces", ignore = true)

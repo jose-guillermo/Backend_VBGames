@@ -2,6 +2,9 @@ server:
     port: ${SERVER_PORT}
 
 spring:
+    jmx:
+        enabled: false
+
     application:
         name: userservice
 
@@ -22,7 +25,7 @@ spring:
             ddl-auto: none
         show-sql: true
         open-in-view: false
-    
+
     kafka: 
         bootstrap-servers: ${KAFKA_SERVER}
         consumer:
@@ -42,7 +45,5 @@ spring:
 jwt:
     access:
         private: ${JWT_ACCESS_PRIVATE}
-        public: ${JWT_ACCESS_PUBLIC}
     refresh:
         private: ${JWT_REFRESH_PRIVATE}
-        public: ${JWT_REFRESH_PUBLIC}

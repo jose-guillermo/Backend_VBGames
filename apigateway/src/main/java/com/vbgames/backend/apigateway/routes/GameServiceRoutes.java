@@ -15,11 +15,11 @@ public class GameServiceRoutes {
     @Bean
     RouteLocator gameRoutes(RouteLocatorBuilder builder) {
         return builder.routes()
-                .route(r -> r
-                    .path("/games/**")
-                    .uri(gameServiceUrl)
-                )
-                .build();
+            .route(r -> r
+                .path("/games/**")
+                .uri(gameServiceUrl)
+            )
+            .build();
     }
 
 }

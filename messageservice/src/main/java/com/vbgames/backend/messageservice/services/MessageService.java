@@ -7,7 +7,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.vbgames.backend.common.events.FriendshipEvent;
+import com.vbgames.backend.common.events.FriendshipCreatedEvent;
 import com.vbgames.backend.common.exceptions.ForbiddenActionException;
 import com.vbgames.backend.common.exceptions.ResourceNotFoundException;
 import com.vbgames.backend.messageservice.dtos.MessageResponse;
@@ -71,7 +71,7 @@ public class MessageService {
 
     @KafkaListener(topics = "friendship.events")
     @Transactional
-    public void handleFriendshipRequestSent(FriendshipEvent event) {
+    public void handleFriendshipRequestSent(FriendshipCreatedEvent event) {
         String title = "";
         String body = "";
         switch (event.getType()) {

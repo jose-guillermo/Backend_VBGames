@@ -7,8 +7,9 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.vbgames.backend.common.events.UpdateCoinsEvent;
-import com.vbgames.backend.common.events.UserEvent;
+import com.vbgames.backend.common.events.UserCoinsUpdatedEvent;
+import com.vbgames.backend.common.events.UserCreatedEvent;
+import com.vbgames.backend.common.events.UsernameUpdatedEvent;
 import com.vbgames.backend.common.exceptions.ResourceNotFoundException;
 import com.vbgames.backend.productservice.entities.Product;
 import com.vbgames.backend.productservice.entities.User;
@@ -25,16 +26,20 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final KafkaTemplate<String, UpdateCoinsEvent> kafkaTemplate;
+    private final KafkaTemplate<String, UserCoinsUpdatedEvent> kafkaTemplate;
 
-    @KafkaListener(topics = "user.events")
+    @KafkaListener(topics = "user.created")
     @Transactional
-    public void handleUserEvent(UserEvent userEvent) {
-        userRepository.findById(userEvent.getId())
-            .ifPresentOrElse(
-                existingUser -> existingUser.setUsername(userEvent.getUsername()),
-                () -> userRepository.save(userMapper.toUser(userEvent))
-            );
+    public void handleUserEvent(UserCreatedEvent event) {
+        User user = userMapper.toUser(event);
+        userRepository.save(user);
+    }
+
+    @KafkaListener(topics = "username.updated")
+    @Transactional
+    public void handleUserEvent(UsernameUpdatedEvent event) {
+        User user = userRepository.findById(event.getId()).get();
+        user.setUsername(event.getUsername());
     }
 
     @Transactional
@@ -58,8 +63,7 @@ public class UserService {
     }
 
     private void sendUpdateCoinsEvent(User user) {
-        UpdateCoinsEvent updateCoinsEvent = userMapper.toUpdateCoinsEvent(user);
+        UserCoinsUpdatedEvent updateCoinsEvent = userMapper.toUpdateCoinsEvent(user);
         kafkaTemplate.send("user.coins.updated", updateCoinsEvent);
     }
-
 }

@@ -15,10 +15,10 @@ public class MessageServiceRoutes {
     @Bean
     RouteLocator messageRoutes(RouteLocatorBuilder builder) {
         return builder.routes()
-                .route(r -> r
-                    .path("/messages/**")
-                    .uri(messageServiceUrl)
-                )
-                .build();
+            .route(r -> r
+                .path("/messages/**")
+                .uri(messageServiceUrl)
+            )
+            .build();
     }
 }

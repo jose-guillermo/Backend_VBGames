@@ -4,16 +4,13 @@ import java.util.UUID;
 
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.vbgames.backend.common.enums.UserEventType;
-import com.vbgames.backend.common.events.UpdateCoinsEvent;
-import com.vbgames.backend.common.events.UserEvent;
-import com.vbgames.backend.common.exceptions.DuplicateResourceException;
+import com.vbgames.backend.common.events.UserCoinsUpdatedEvent;
+import com.vbgames.backend.common.events.UserCreatedEvent;
+import com.vbgames.backend.common.events.UsernameUpdatedEvent;
 import com.vbgames.backend.common.exceptions.ResourceNotFoundException;
-import com.vbgames.backend.userservice.dtos.RegisterRequest;
 import com.vbgames.backend.userservice.dtos.UserResponse;
 import com.vbgames.backend.userservice.entities.Game;
 import com.vbgames.backend.userservice.entities.Role;
@@ -32,9 +29,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final GameRepository gameRepository;
     private final RoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
-    private final KafkaTemplate<String, UserEvent> kafkaTemplate;
+    private final KafkaTemplate<String, UsernameUpdatedEvent> kafkaTemplate;
 
     @Transactional(readOnly = true)
     public UserResponse getUser(UUID id) {
@@ -43,34 +39,12 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse registerUser(RegisterRequest user) {
-        if(userRepository.existsByEmail(user.getEmail())) 
-            throw new DuplicateResourceException("El correo '" + user.getEmail() + "' ya existe en la tabla users");
-        
-        if(userRepository.existsByUsername(user.getUsername())) 
-            throw new DuplicateResourceException("El nombre de usuario '" + user.getUsername() + "' ya existe en la tabla users");
-
-        // Hashcodear la contraseña
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setEmail(user.getEmail().toLowerCase());
-
-        User newUser = userRepository.save(userMapper.toUser(user));
-        Role userRole = roleRepository.findByName("ROLE_USER").get();
-
-        newUser.getRoles().add(userRole);
-
-        sendUserEvent(newUser, UserEventType.CREATED);
-
-        return userMapper.toUserResponse(newUser);
-    }
-
-    @Transactional
     public UserResponse updateUsername(String username, UUID userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
         user.setUsername(username);
 
-        sendUserEvent(user, UserEventType.UPDATED);
+        sendUserEvent(user);
 
         return userMapper.toUserResponse(user);
     }
@@ -90,19 +64,29 @@ public class UserService {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
         user.setOnline(!user.isOnline());
-
     }
 
     @KafkaListener(topics = "user.coins.updated")
     @Transactional
-    public void handleUpdateCoinsEvent(UpdateCoinsEvent updateCoinsEvent) {
-        userRepository.findById(updateCoinsEvent.getId())
-            .ifPresent(user -> user.setCoins(updateCoinsEvent.getCoins()));
+    public void handleUpdateCoinsEvent(UserCoinsUpdatedEvent event) {
+        userRepository.findById(event.getId())
+            .ifPresent(user -> user.setCoins(event.getCoins()));
     }
 
-    private void sendUserEvent(User user, UserEventType type) {
-        UserEvent userEvent = userMapper.toUserEvent(user, type);
+    @KafkaListener(topics = "user.created")
+    @Transactional
+    public void handleUserCreatedEvent(UserCreatedEvent event) {
+        User user = userMapper.toUser(event);
+        user = userRepository.save(user);
 
-        kafkaTemplate.send("user.events", userEvent);
+        Role userRole = roleRepository.findByName("ROLE_USER").get();
+
+        user.getRoles().add(userRole);
+    }
+
+    private void sendUserEvent(User user) {
+        UsernameUpdatedEvent event = userMapper.toUsernameUpdatedEvent(user);
+
+        kafkaTemplate.send("username.updated", event);
     }
 }

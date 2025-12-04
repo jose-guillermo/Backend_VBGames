@@ -15,7 +15,7 @@ import com.vbgames.backend.gameservice.entities.Piece;
 import com.vbgames.backend.gameservice.mappers.GameMapper;
 import com.vbgames.backend.gameservice.mappers.PieceMapper;
 import com.vbgames.backend.gameservice.repositories.GameRepository;
-import com.vbgames.backend.common.events.GameEvent;
+import com.vbgames.backend.common.events.GameUpsertedEvent;
 import com.vbgames.backend.common.exceptions.DuplicateResourceException;
 import com.vbgames.backend.common.exceptions.ResourceNotFoundException;
 
@@ -28,7 +28,7 @@ public class GameService{
     private final GameRepository gameRepository;
     private final GameMapper gameMapper;
     private final PieceMapper pieceMapper;
-    private final KafkaTemplate<String, GameEvent> kafkaTemplate;
+    private final KafkaTemplate<String, GameUpsertedEvent> kafkaTemplate;
 
     @Transactional
     public GameResponse create(GameCreateRequest gameDto) {
@@ -71,9 +71,9 @@ public class GameService{
     }
 
     private void sendGameEvent(Game game) {
-        GameEvent gameEvent = gameMapper.toGameEvent(game);
+        GameUpsertedEvent gameEvent = gameMapper.toGameEvent(game);
 
         System.out.println("Sending game event: " + gameEvent);
-        kafkaTemplate.send("game.events", gameEvent);
+        kafkaTemplate.send("game.upserted", gameEvent);
     }
 }

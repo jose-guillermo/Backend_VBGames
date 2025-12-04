@@ -8,7 +8,6 @@ import org.hibernate.type.SqlTypes;
 
 import com.vbgames.backend.productservice.enums.ProductType;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -46,7 +45,7 @@ public class Product {
     @ToString.Exclude
     private Game game;
 
-    @ManyToMany(mappedBy = "products", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "products")
     @ToString.Exclude
     private List<User> users;
 }

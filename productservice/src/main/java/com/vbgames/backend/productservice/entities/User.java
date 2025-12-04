@@ -3,7 +3,6 @@ package com.vbgames.backend.productservice.entities;
 import java.util.List;
 import java.util.UUID;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -27,7 +26,7 @@ public class User {
     private String username;
     private int coins;
 
-    @ManyToMany(cascade = CascadeType.REMOVE)
+    @ManyToMany
     @JoinTable(
         name = "purchases",
         joinColumns = @JoinColumn(name = "user_id"),

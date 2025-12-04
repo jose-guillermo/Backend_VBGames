@@ -1,5 +1,7 @@
 package com.vbgames.backend.friendshipservice.entities;
 
+import java.time.Instant;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
@@ -39,6 +41,6 @@ public class Friendship {
         this.friend = friend;
         this.id = new FriendshipId(user.getId(), friend.getId());
         this.accepted = false;
-        this.createdAt = System.currentTimeMillis();
+        this.createdAt = Instant.now().toEpochMilli();
     }
 }

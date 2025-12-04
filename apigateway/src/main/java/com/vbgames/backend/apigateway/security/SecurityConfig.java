@@ -22,8 +22,8 @@ public class SecurityConfig {
         return http
             .authorizeExchange(auth -> auth
                 // Rutas públicas
-                .pathMatchers(HttpMethod.POST,"login", "refresh", "users").permitAll()
-                .pathMatchers(HttpMethod.GET,"games").permitAll()
+                .pathMatchers(HttpMethod.POST,"auth/login", "auth/refresh", "auth/register").permitAll()
+                .pathMatchers(HttpMethod.GET,"games", "auth/verify/*").permitAll()
                 // Rutas solo para el admin
                 .pathMatchers(HttpMethod.POST,"games").hasRole("ADMIN")
                 .pathMatchers(HttpMethod.PUT,"games/*").hasRole("ADMIN")

@@ -4,7 +4,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.vbgames.backend.common.events.GameEvent;
+import com.vbgames.backend.common.events.GameUpsertedEvent;
 import com.vbgames.backend.productservice.entities.Game;
 import com.vbgames.backend.productservice.mappers.GameMapper;
 import com.vbgames.backend.productservice.repositories.GameRepository;
@@ -18,10 +18,10 @@ public class GameService {
     private final GameRepository gameRepository;
     private final GameMapper gameMapper;
 
-    @KafkaListener(topics = "game.events")
+    @KafkaListener(topics = "game.upserted")
     @Transactional
-    public void handleGameEvent(GameEvent gameEvent) {
-        Game game = gameMapper.toGame(gameEvent);
+    public void handleGameEvent(GameUpsertedEvent event) {
+        Game game = gameMapper.toGame(event);
         gameRepository.save(game);
     }
 

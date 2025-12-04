@@ -12,6 +12,8 @@ microservices:
         url: ${PRODUCT_SERVICE_URL}
     message-service:
         url: ${MESSAGE_SERVICE_URL}
+    auth-service:
+        url: ${AUTH_SERVICE_URL}
 
 jwt:
     access:

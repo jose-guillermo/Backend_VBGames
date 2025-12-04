@@ -8,9 +8,6 @@ import java.util.UUID;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -34,8 +31,6 @@ public class User {
     
     private String username;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private String password;
     private String email;
     private int coins;
 
@@ -47,7 +42,7 @@ public class User {
     @JoinColumn(name = "favourite_game")
     private Game favouriteGame;
     
-    @ManyToMany(cascade = CascadeType.REMOVE)
+    @ManyToMany
     // @JsonIgnoreProperties({"users", "handler", "hibernateLazyInitializer"})
     @JoinTable(
         name = "users_roles",
@@ -57,15 +52,14 @@ public class User {
     private List<Role> roles;
 
     public User(){
-        this.creationDateEpoch = Instant.now().getEpochSecond();
+        this.creationDateEpoch = Instant.now().toEpochMilli();
         this.roles = new ArrayList<>();
     }
 
-    public User(String username, String password, String email) {
+    public User(String username, String email) {
         this.username = username;
-        this.password = password;
         this.email = email;
-        this.creationDateEpoch = Instant.now().getEpochSecond();
+        this.creationDateEpoch = Instant.now().toEpochMilli();
         this.roles = new ArrayList<>();
     }
 }

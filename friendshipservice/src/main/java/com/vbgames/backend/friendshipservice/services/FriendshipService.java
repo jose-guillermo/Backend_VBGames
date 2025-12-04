@@ -1,5 +1,7 @@
 package com.vbgames.backend.friendshipservice.services;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -9,7 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vbgames.backend.common.enums.FriendshipEventType;
-import com.vbgames.backend.common.events.FriendshipEvent;
+import com.vbgames.backend.common.events.FriendshipCreatedEvent;
 import com.vbgames.backend.common.exceptions.ResourceNotFoundException;
 import com.vbgames.backend.friendshipservice.dtos.FriendResponse;
 import com.vbgames.backend.friendshipservice.entities.Friendship;
@@ -27,7 +29,7 @@ public class FriendshipService {
 
     private final UserRepository userRepository;
     private final FriendshipRepository friendshipRepository;
-    private final KafkaTemplate<String, FriendshipEvent> kafkaTemplate;
+    private final KafkaTemplate<String, FriendshipCreatedEvent> kafkaTemplate;
 
     @Transactional(readOnly = true)
     public ArrayList<FriendResponse> getFriends(UUID userId) {
@@ -69,13 +71,13 @@ public class FriendshipService {
     @Transactional
     @Scheduled(cron = "0 0 0 * * *")
     public void deleteExpiredFriendships() {
-        long thirstyDaysAgo = System.currentTimeMillis() - (24 * 60 * 60 * 1000);
+        long thirstyDaysAgo = Instant.now().minus(30, ChronoUnit.DAYS).toEpochMilli();
 
         friendshipRepository.deleteExpiredFriendships(thirstyDaysAgo);
     }
 
     private void sendFriendshipEvent(UUID senderId, UUID recipientId, FriendshipEventType type) {
-        FriendshipEvent event = new FriendshipEvent(senderId, recipientId, type);
+        FriendshipCreatedEvent event = new FriendshipCreatedEvent(senderId, recipientId, type);
         kafkaTemplate.send("friendship.events", event);
     }
 }

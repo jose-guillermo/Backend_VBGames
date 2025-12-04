@@ -15,10 +15,10 @@ public class FriendshipServiceRoutes {
     @Bean
     RouteLocator friendshipRoutes(RouteLocatorBuilder builder) {
         return builder.routes()
-                .route(r -> r
-                    .path("/friendships/**")
-                    .uri(friendshipServiceUrl)
-                )
-                .build();
+            .route(r -> r
+                .path("/friendships/**")
+                .uri(friendshipServiceUrl)
+            )
+            .build();
     }
 }
