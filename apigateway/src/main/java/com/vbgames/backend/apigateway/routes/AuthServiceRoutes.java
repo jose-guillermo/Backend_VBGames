@@ -31,4 +31,17 @@ public class AuthServiceRoutes {
             )
             .build();
     }
+
+    @Bean
+    public RouteLocator authServiceApiDocs(RouteLocatorBuilder builder) {
+        return builder.routes()
+            .route(r -> r
+                .path("/docs/authservice/v3/api-docs")
+                .filters(f -> f
+                    .rewritePath("/docs/authservice/v3/api-docs", "/v3/api-docs")
+                )
+                .uri(authServiceUrl)
+            )
+            .build();
+    }
 }

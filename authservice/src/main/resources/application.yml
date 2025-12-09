@@ -3,7 +3,7 @@ server:
 
 spring:
     application:
-        name: userservice
+        name: authservice
 
     datasource:
         url: ${DB_URL}
@@ -60,3 +60,9 @@ jwt:
         private: ${JWT_REFRESH_PRIVATE}
     verify-email:
         secret: ${JWT_VERIFY_EMAIL_SECRET}
+
+springdoc:
+    swagger-ui:
+        path: /swagger-ui.html 
+    api-docs:
+        path: /v3/api-docs

@@ -1,5 +1,6 @@
 package com.vbgames.backend.apigateway.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -17,6 +18,9 @@ public class SecurityConfig {
 
     private final JwtService jwtService;
 
+    @Value("${security.excluded.urls}")
+    private String[] excludedUrls;
+
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         return http
@@ -24,6 +28,7 @@ public class SecurityConfig {
                 // Rutas públicas
                 .pathMatchers(HttpMethod.POST,"auth/login", "auth/refresh", "auth/register").permitAll()
                 .pathMatchers(HttpMethod.GET,"games", "auth/verify/*").permitAll()
+                .pathMatchers(excludedUrls).permitAll()
                 // Rutas solo para el admin
                 .pathMatchers(HttpMethod.POST,"games").hasRole("ADMIN")
                 .pathMatchers(HttpMethod.PUT,"games/*").hasRole("ADMIN")
