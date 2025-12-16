@@ -12,6 +12,7 @@ public interface UserMapper {
 
     @Mapping(target = "friends", ignore = true)
     @Mapping(target = "friendOf", ignore = true)
+    @Mapping(target = "username", ignore = true)
     User toUser(UserCreatedEvent userEvent);
 
     @Mapping(target = "friends", ignore = true)

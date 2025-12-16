@@ -3,7 +3,7 @@ DROP TABLE IF EXISTS messages CASCADE;
 
 CREATE TABLE users (
     id UUID PRIMARY KEY,
-    username TEXT NOT NULL UNIQUE
+    username TEXT UNIQUE
 );
 
 CREATE TABLE messages (

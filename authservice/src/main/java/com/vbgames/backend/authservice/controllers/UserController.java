@@ -9,9 +9,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.vbgames.backend.common.exceptions.RequestValidationException;
 import com.vbgames.backend.authservice.dtos.RegisterRequest;
 import com.vbgames.backend.authservice.dtos.UserResponse;
+import com.vbgames.backend.authservice.services.JwtService;
 import com.vbgames.backend.authservice.services.UserService;
 import com.vbgames.backend.authservice.validators.ConfirmPassword;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
@@ -31,7 +34,10 @@ public class UserController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public UserResponse registerUser(@Valid @RequestBody @ConfirmPassword RegisterRequest request, BindingResult result) {
+    public UserResponse registerUser(
+        @Valid @RequestBody @ConfirmPassword RegisterRequest request, 
+        BindingResult result
+    ) {
         validation(result);
 
         return userService.registerUser(request);
@@ -42,6 +48,28 @@ public class UserController {
     public void verifyEmail(@PathVariable String token) {
         userService.verifyEmail(token);
     }
+
+    @PostMapping("/login")
+    @ResponseStatus(HttpStatus.OK)
+    public void postMethodName(
+        @RequestBody @ConfirmPassword RegisterRequest request,
+        BindingResult result,
+        HttpServletResponse response
+    ) {
+        validation(result);
+        userService.login(request, response);
+    }
+
+    @PostMapping("/refresh")
+    @ResponseStatus(HttpStatus.OK)
+    public void postMethodName(
+        @CookieValue(name = JwtService.COOKIE_REFRESH_TOKEN) String refreshToken,
+        HttpServletResponse response
+    ) {
+        userService.refresh(refreshToken, response);
+    }
+    
+    
 
     private void validation(BindingResult result) {
         if (!result.hasFieldErrors()) return;

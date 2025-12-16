@@ -10,7 +10,7 @@ CREATE TABLE games (
 
 CREATE TABLE users (
     id UUID PRIMARY KEY,
-    username TEXT NOT NULL UNIQUE,
+    username TEXT UNIQUE,
     coins INTEGER DEFAULT 0
 );
 

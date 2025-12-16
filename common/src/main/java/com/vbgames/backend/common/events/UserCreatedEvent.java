@@ -11,6 +11,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserCreatedEvent {
     private UUID id;
-    private String username;
     private String email;
 }

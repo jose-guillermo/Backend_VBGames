@@ -57,7 +57,7 @@ jwt:
     access:
         private: ${JWT_ACCESS_PRIVATE}
     refresh:
-        private: ${JWT_REFRESH_PRIVATE}
+        secret: ${JWT_REFRESH_SECRET}
     verify-email:
         secret: ${JWT_VERIFY_EMAIL_SECRET}
 
@@ -66,3 +66,13 @@ springdoc:
         path: /swagger-ui.html 
     api-docs:
         path: /v3/api-docs
+
+logging:
+  level:
+    org:
+        hibernate:
+            SQL: DEBUG
+            type:
+                descriptor:
+                    sql:
+                        BasicBinder: TRACE

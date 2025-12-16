@@ -4,11 +4,10 @@ DROP TABLE IF EXISTS roles CASCADE;
 
 CREATE TABLE users (
     id UUID PRIMARY KEY,
-    username TEXT UNIQUE NOT NULL,
     password TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
     verified BOOLEAN NOT NULL,
-    expired_at BIGINT
+    expires_at BIGINT
 );
 
 CREATE TABLE roles (
@@ -22,4 +21,15 @@ CREATE TABLE users_roles (
     FOREIGN KEY (user_id) REFERENCES users (id),
     FOREIGN KEY (role_id) REFERENCES roles (id),
     PRIMARY KEY (user_id, role_id)
+);
+
+CREATE TABLE refresh_tokens (
+    id UUID PRIMARY KEY,
+    token TEXT UNIQUE NOT NULL,
+    user_id UUID NOT NULL,
+    expires_at BIGINT NOT NULL,
+
+    FOREIGN KEY (user_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE
 );

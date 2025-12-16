@@ -13,6 +13,7 @@ public interface UserMapper {
 
     @Mapping(target = "products", ignore = true)
     @Mapping(target = "coins", ignore = true)
+    @Mapping(target = "username", ignore = true)
     User toUser(UserCreatedEvent event);
 
     @Mapping(target = "products", ignore = true)

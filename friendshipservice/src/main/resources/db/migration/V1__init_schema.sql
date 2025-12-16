@@ -3,7 +3,7 @@ DROP TABLE IF EXISTS users CASCADE;
 
 CREATE TABLE users (
     id UUID PRIMARY KEY,
-    username TEXT UNIQUE NOT NULL
+    username TEXT UNIQUE
 );
 
 CREATE TABLE friendships (

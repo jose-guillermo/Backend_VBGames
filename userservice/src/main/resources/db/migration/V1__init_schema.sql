@@ -11,10 +11,11 @@ CREATE TABLE games (
 CREATE TABLE users (
     id UUID PRIMARY KEY,
     favourite_game UUID DEFAULT NULL,
-    username TEXT UNIQUE NOT NULL,
+    username TEXT UNIQUE NULL,
     coins INTEGER DEFAULT 0,
     email TEXT UNIQUE NOT NULL,
     created_at BIGINT NOT NULL,
+    last_connected_at BIGINT,
     online BOOLEAN DEFAULT false,
     FOREIGN KEY (favourite_game) REFERENCES games (id)
 );

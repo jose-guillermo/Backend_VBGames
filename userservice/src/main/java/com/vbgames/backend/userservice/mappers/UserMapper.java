@@ -18,6 +18,7 @@ public interface UserMapper {
     @Mapping(target = "favouriteGame", ignore = true)
     @Mapping(target = "roles", ignore = true)
     @Mapping(target = "creationDateEpoch", ignore = true)
+    @Mapping(target = "username", ignore = true)
     User toUser(UserCreatedEvent user);
 
     UserResponse toUserResponse(User user);

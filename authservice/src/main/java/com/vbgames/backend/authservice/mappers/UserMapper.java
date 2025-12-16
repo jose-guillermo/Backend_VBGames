@@ -15,13 +15,13 @@ public interface UserMapper {
     @Mapping(target = "id", ignore = true) 
     @Mapping(target = "roles", ignore = true)
     @Mapping(target = "verified", ignore = true)
-    @Mapping(target = "expiredAt", ignore = true)
+    @Mapping(target = "expiresAt", ignore = true)
+    @Mapping(target = "refreshTokens", ignore = true)
     User toUser(RegisterRequest userDto);
 
     UserResponse toUserResponse(User user);
 
-    @Mapping(target = "username", source = "username")
-    UserCreatedEvent toUserCreatedEvent(User user, String username);
+    UserCreatedEvent toUserCreatedEvent(User user);
 
     default String mapRoleToString(Role role) {
         return role.getName();

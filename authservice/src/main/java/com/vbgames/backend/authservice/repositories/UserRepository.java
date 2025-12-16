@@ -14,8 +14,6 @@ public interface UserRepository extends CrudRepository<User, UUID> {
 
     Optional<User> findByEmail(String email);
     
-    Boolean existsByUsername(String username);
-
-    @Query(value = "DELETE FROM users WHERE expired_at < :now", nativeQuery = true)
+    @Query(value = "DELETE FROM users WHERE expires_at < :now", nativeQuery = true)
     void deleteExpiredUsers(Long now);
 }

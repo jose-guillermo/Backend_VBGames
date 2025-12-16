@@ -16,16 +16,6 @@ public class AuthServiceRoutes {
     RouteLocator authRoutes(RouteLocatorBuilder builder) {
         return builder.routes()
             .route(r -> r
-                .path("/auth/login")
-                .filters(f -> f.rewritePath("/auth/login", "/login"))
-                .uri(authServiceUrl)
-            )
-            .route(r -> r
-                .path("/auth/refresh")
-                .filters(f -> f.rewritePath("/auth/refresh", "/refresh"))
-                .uri(authServiceUrl)
-            )
-            .route(r -> r
                 .path("/auth/**")
                 .uri(authServiceUrl)
             )

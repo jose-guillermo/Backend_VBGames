@@ -19,9 +19,9 @@ public class MailService {
     @Value("${mail.from}")
     private String sender;
 
-    public void sendVerificationMail(String user, String email) {
+    public void sendVerificationMail(String email) {
 
-        String token = jwtService.createVerifyEmailToken(user, email);
+        String token = jwtService.createEmailToken(email);
         String subject = "Verify your email";
         String verificationLink = "http://localhost:8080/auth/verify/" + token;
         String content =
