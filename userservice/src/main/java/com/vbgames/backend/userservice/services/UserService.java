@@ -7,6 +7,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.vbgames.backend.common.enums.ErrorCode;
 import com.vbgames.backend.common.events.UserCoinsUpdatedEvent;
 import com.vbgames.backend.common.events.UserCreatedEvent;
 import com.vbgames.backend.common.events.UsernameUpdatedEvent;
@@ -34,13 +35,15 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserResponse getUser(UUID id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+        User user = userRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado", ErrorCode.USER_NOT_FOUND));
         return userMapper.toUserResponse(user);
     }
 
     @Transactional
     public UserResponse updateUsername(String username, UUID userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado", ErrorCode.USER_NOT_FOUND));
 
         user.setUsername(username);
 
@@ -51,8 +54,10 @@ public class UserService {
 
     @Transactional
     public UserResponse updateFavouriteGame(UUID userId, UUID gameId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
-        Game game = gameRepository.findById(gameId).orElseThrow(() -> new ResourceNotFoundException("Juego no encontrado"));
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado", ErrorCode.USER_NOT_FOUND));
+        Game game = gameRepository.findById(gameId)
+            .orElseThrow(() -> new ResourceNotFoundException("Juego no encontrado", ErrorCode.GAME_NOT_FOUND));
 
         user.setFavouriteGame(game);
 
@@ -61,7 +66,8 @@ public class UserService {
 
     @Transactional
     public void onlineOffline(UUID userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado", ErrorCode.USER_NOT_FOUND));
 
         user.setOnline(!user.isOnline());
     }

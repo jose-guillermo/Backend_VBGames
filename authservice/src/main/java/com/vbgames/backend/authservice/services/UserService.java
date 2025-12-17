@@ -20,10 +20,12 @@ import com.vbgames.backend.authservice.entities.RefreshToken;
 import com.vbgames.backend.authservice.entities.Role;
 import com.vbgames.backend.authservice.entities.User;
 import com.vbgames.backend.authservice.exceptions.InvalidCredentialsException;
+import com.vbgames.backend.authservice.exceptions.PendingEmailVerificationException;
 import com.vbgames.backend.authservice.mappers.UserMapper;
 import com.vbgames.backend.authservice.repositories.RefreshTokenRepository;
 import com.vbgames.backend.authservice.repositories.RoleRepository;
 import com.vbgames.backend.authservice.repositories.UserRepository;
+import com.vbgames.backend.common.enums.ErrorCode;
 import com.vbgames.backend.common.events.UserCreatedEvent;
 import com.vbgames.backend.common.exceptions.DuplicateResourceException;
 import com.vbgames.backend.common.exceptions.ResourceNotFoundException;
@@ -48,13 +50,15 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserResponse getUser(UUID id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+        User user = userRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado", ErrorCode.USER_NOT_FOUND));
         return userMapper.toUserResponse(user);
     }
 
     @Transactional
     public void login(RegisterRequest request, HttpServletResponse response) {
-        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new InvalidCredentialsException());
+        User user = userRepository.findByEmail(request.getEmail())
+            .orElseThrow(() -> new InvalidCredentialsException());
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) 
             throw new InvalidCredentialsException();
@@ -117,12 +121,12 @@ public class UserService {
         if(duplicatedUser.isPresent()){
             User existingUser = duplicatedUser.get();
             if (existingUser.isVerified())
-                throw new DuplicateResourceException("El correo '" + request.getEmail() + "' ya existe en la tabla users");
+                throw new DuplicateResourceException("Ya existe un usuario con ese correo", ErrorCode.EMAIL_ALREADY_EXISTS);
             if (existingUser.getExpiresAt() < Instant.now().toEpochMilli())
                 userRepository.delete(existingUser);
             else{
                 mailService.sendVerificationMail(existingUser.getEmail());
-                throw new IllegalStateException("Ya existe un registro pendiente de verificación.");
+                throw new PendingEmailVerificationException("Ya existe un registro pendiente de verificación.");
             }
         }
 

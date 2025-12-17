@@ -7,6 +7,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.vbgames.backend.common.enums.ErrorCode;
 import com.vbgames.backend.common.events.FriendshipCreatedEvent;
 import com.vbgames.backend.common.exceptions.ForbiddenActionException;
 import com.vbgames.backend.common.exceptions.ResourceNotFoundException;
@@ -37,8 +38,10 @@ public class MessageService {
 
     @Transactional
     public MessageResponse sendMessage(UUID senderId, UUID recipientId, SendMessageRequest request) {
-        User sender = userRepository.findById(senderId).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
-        User recipient = userRepository.findById(recipientId).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+        User sender = userRepository.findById(senderId)
+            .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado", ErrorCode.SENDER_NOT_FOUND));
+        User recipient = userRepository.findById(recipientId)
+            .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado", ErrorCode.RECIPIENT_NOT_FOUND));
 
         Message message = messageMapper.toMessage(request, sender, recipient);
 
@@ -50,7 +53,7 @@ public class MessageService {
     @Transactional
     public void readMessage(UUID userId, UUID messageId) {
         Message message = messageRepository.findById(messageId)
-            .orElseThrow(() -> new ResourceNotFoundException("Mensaje no encontrado"));
+            .orElseThrow(() -> new ResourceNotFoundException("Mensaje no encontrado", ErrorCode.MESSAGE_NOT_FOUND));
 
         if (!message.getRecipient().getId().equals(userId)) 
             throw new ForbiddenActionException("No tienes permiso para leer este mensaje");
@@ -61,7 +64,7 @@ public class MessageService {
     @Transactional
     public void deleteMessage(UUID userId, UUID messageId) {
         Message message = messageRepository.findById(messageId)
-            .orElseThrow(() -> new ResourceNotFoundException("Mensaje no encontrado"));
+            .orElseThrow(() -> new ResourceNotFoundException("Mensaje no encontrado", ErrorCode.MESSAGE_NOT_FOUND));
 
         if (!message.getRecipient().getId().equals(userId)) 
             throw new ForbiddenActionException("No tienes permiso para eliminar este mensaje");

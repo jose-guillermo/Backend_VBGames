@@ -1,29 +1,28 @@
-package com.vbgames.backend.productservice.controllers;
+package com.vbgames.backend.productservice.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.vbgames.backend.common.enums.ErrorCode;
 import com.vbgames.backend.common.exceptions.ApiError;
 import com.vbgames.backend.common.exceptions.GlobalExceptionHandler;
-import com.vbgames.backend.productservice.exceptions.InsufficientCoinsException;
-import com.vbgames.backend.productservice.exceptions.ProductAlreadyOwnedException;
 
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestControllerAdvice
-public class HandlerExceptionController extends GlobalExceptionHandler{
+public class ProductExceptionHandler extends GlobalExceptionHandler{
 
     @ExceptionHandler(InsufficientCoinsException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError handlerInsufficientCoinsException(InsufficientCoinsException ex, HttpServletRequest request) {
-        return new ApiError(ex.getMessage(), HttpStatus.BAD_REQUEST, request);
+        return new ApiError(ex.getMessage(), HttpStatus.CONFLICT, request, ErrorCode.INSUFFICIENT_COINS);
     }
 
     @ExceptionHandler(ProductAlreadyOwnedException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError handlerProductAlreadyOwnedException(ProductAlreadyOwnedException ex, HttpServletRequest request) {
-        return new ApiError(ex.getMessage(), HttpStatus.CONFLICT, request);
+        return new ApiError(ex.getMessage(), HttpStatus.CONFLICT, request, ErrorCode.PRODUCT_ALREADY_OWNED);
     }
 }

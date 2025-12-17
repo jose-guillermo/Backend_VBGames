@@ -15,6 +15,7 @@ import com.vbgames.backend.gameservice.entities.Piece;
 import com.vbgames.backend.gameservice.mappers.GameMapper;
 import com.vbgames.backend.gameservice.mappers.PieceMapper;
 import com.vbgames.backend.gameservice.repositories.GameRepository;
+import com.vbgames.backend.common.enums.ErrorCode;
 import com.vbgames.backend.common.events.GameUpsertedEvent;
 import com.vbgames.backend.common.exceptions.DuplicateResourceException;
 import com.vbgames.backend.common.exceptions.ResourceNotFoundException;
@@ -33,7 +34,7 @@ public class GameService{
     @Transactional
     public GameResponse create(GameCreateRequest gameDto) {
         if(gameRepository.existsByName(gameDto.getName())) 
-            throw new DuplicateResourceException("El nombre '" + gameDto.getName() + "' ya existe en la tabla games");
+            throw new DuplicateResourceException("Ya existe un juego con ese nombre", ErrorCode.GAME_ALREADY_EXISTS);
 
         Game game = gameRepository.save(gameMapper.GameCreateRequestToGame(gameDto));
 
@@ -53,11 +54,12 @@ public class GameService{
 
     @Transactional
     public GameResponse update(GameUpdateRequest gameDto, UUID id) {
-        Game game = gameRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Juego no encontrado"));
+        Game game = gameRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Juego no encontrado", ErrorCode.GAME_NOT_FOUND));
 
         // Si el nombre del juego es diferente al actual y existe en la base de datos lanzamos exception
         if (!gameDto.getName().equals(game.getName()) && gameRepository.existsByName(gameDto.getName())) 
-            throw new DuplicateResourceException("El nombre '" + gameDto.getName() + "' ya existe en la tabla games");
+            throw new DuplicateResourceException("Ya existe un juego con ese nombre", ErrorCode.GAME_ALREADY_EXISTS);
 
         // Lanza el evento si el nombre del juego va a cambiar
         if(!gameDto.getName().equals(game.getName())) {

@@ -1,10 +1,10 @@
-package com.vbgames.backend.messageservice.controllers;
+package com.vbgames.backend.gameservice.exceptions;
 
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.vbgames.backend.common.exceptions.GlobalExceptionHandler;
 
 @RestControllerAdvice
-public class HandlerExceptionController extends GlobalExceptionHandler {
+public class GameExceptionHandler extends GlobalExceptionHandler {
 
 }

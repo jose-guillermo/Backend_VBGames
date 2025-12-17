@@ -7,6 +7,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.vbgames.backend.common.enums.ErrorCode;
 import com.vbgames.backend.common.events.UserCoinsUpdatedEvent;
 import com.vbgames.backend.common.events.UserCreatedEvent;
 import com.vbgames.backend.common.events.UsernameUpdatedEvent;
@@ -45,7 +46,7 @@ public class UserService {
     @Transactional
     public User buyProduct(UUID userId, Product product) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+            .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado", ErrorCode.USER_NOT_FOUND));
         
         if (user.getProducts().contains(product))
             throw new ProductAlreadyOwnedException("Ya tienes este producto"); 

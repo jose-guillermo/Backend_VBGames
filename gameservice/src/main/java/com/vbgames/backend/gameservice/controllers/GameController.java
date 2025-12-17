@@ -2,7 +2,6 @@ package com.vbgames.backend.gameservice.controllers;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.vbgames.backend.common.exceptions.IdMismatchException;
 import com.vbgames.backend.common.exceptions.RequestValidationException;
 import com.vbgames.backend.common.validators.IsUUID;
 import com.vbgames.backend.gameservice.dtos.GameCreateRequest;
@@ -53,9 +52,6 @@ public class GameController {
     @ResponseStatus(HttpStatus.OK)
     public GameResponse update(@Valid @RequestBody GameUpdateRequest gameDto, BindingResult result, @Valid @PathVariable @IsUUID String id) {
         validation(result);
-
-        if(gameDto.getId() != null && !gameDto.getId().equals(id))
-            throw new IdMismatchException("El id del juego de la url y del body no coinciden");
 
         UUID gameId = UUID.fromString(id);
 

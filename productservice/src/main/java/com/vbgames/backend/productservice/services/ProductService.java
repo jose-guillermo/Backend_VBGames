@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.vbgames.backend.common.enums.ErrorCode;
 import com.vbgames.backend.common.exceptions.DuplicateResourceException;
 import com.vbgames.backend.common.exceptions.ResourceNotFoundException;
 import com.vbgames.backend.productservice.dtos.ProductResponse;
@@ -46,10 +47,11 @@ public class ProductService {
     
     @Transactional
     public ProductResponse createProduct(CreateProductRequest productDto, UUID gameId) {
-        Game game = gameRepository.findById(gameId).orElseThrow(() -> new ResourceNotFoundException("El juego no existe"));
+        Game game = gameRepository.findById(gameId)
+            .orElseThrow(() -> new ResourceNotFoundException("El juego no existe", ErrorCode.GAME_NOT_FOUND));
         
         if(productRepository.findByName(productDto.getName()).isPresent())
-            throw new DuplicateResourceException("El producto '" + productDto.getName() + "' ya existe en la tabla products");
+            throw new DuplicateResourceException("Ya existe un producto con ese nombre", ErrorCode.PRODUCT_ALREADY_EXISTS);
         
         Product product = productMapper.toProduct(productDto);
 
@@ -65,7 +67,7 @@ public class ProductService {
     @Transactional
     public PurchaseResponse purchaseProduct(UUID userId, UUID productId) {
         Product product = productRepository.findById(productId)
-            .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado"));
+            .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado", ErrorCode.PRODUCT_NOT_FOUND));
   
         User user = userService.buyProduct(userId, product);
 

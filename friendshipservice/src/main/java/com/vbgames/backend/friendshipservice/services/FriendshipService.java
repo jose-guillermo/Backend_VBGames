@@ -10,13 +10,14 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.vbgames.backend.common.enums.ErrorCode;
 import com.vbgames.backend.common.enums.FriendshipEventType;
 import com.vbgames.backend.common.events.FriendshipCreatedEvent;
+import com.vbgames.backend.common.exceptions.DuplicateResourceException;
 import com.vbgames.backend.common.exceptions.ResourceNotFoundException;
 import com.vbgames.backend.friendshipservice.dtos.FriendResponse;
 import com.vbgames.backend.friendshipservice.entities.Friendship;
 import com.vbgames.backend.friendshipservice.entities.User;
-import com.vbgames.backend.friendshipservice.exceptions.DuplicateFriendshipException;
 import com.vbgames.backend.friendshipservice.exceptions.SelfFriendRequestException;
 import com.vbgames.backend.friendshipservice.repositories.FriendshipRepository;
 import com.vbgames.backend.friendshipservice.repositories.UserRepository;
@@ -38,12 +39,16 @@ public class FriendshipService {
 
     @Transactional
     public void sendFrienshipRequest(UUID userId, UUID friendId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
-        User friend = userRepository.findById(friendId).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado", ErrorCode.USER_NOT_FOUND));
+        User friend = userRepository.findById(friendId)
+            .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado", ErrorCode.FRIEND_NOT_FOUND));
 
-        if(user.equals(friend)) throw new SelfFriendRequestException("No puedes ser tu propio amigo");
+        if(user.equals(friend)) 
+            throw new SelfFriendRequestException("No puedes ser tu propio amigo");
 
-        if(friendshipRepository.existsByUsers(userId, friendId)) throw new DuplicateFriendshipException("Amistad ya existente");
+        if(friendshipRepository.existsByUsers(userId, friendId)) 
+            throw new DuplicateResourceException("Amistad ya existente", ErrorCode.FRIENDSHIP_ALREADY_EXISTS);
 
         sendFriendshipEvent(userId, friendId, FriendshipEventType.REQUEST);
 
@@ -56,13 +61,14 @@ public class FriendshipService {
         int deleted = friendshipRepository.deleteByUserIdAndFriendId(userId, friendId);
 
         if (deleted == 0) {
-            throw new ResourceNotFoundException("Amistad no encontrada");
+            throw new ResourceNotFoundException("Amistad no encontrada", ErrorCode.FRIENDSHIP_NOT_FOUND);
         }
     }
 
     @Transactional
     public void acceptFriendship(UUID userId, UUID friendId) {
-        Friendship friendship = friendshipRepository.findByUserIdAndFriendId(friendId, userId).orElseThrow(() -> new ResourceNotFoundException("Amistad no encontrada"));
+        Friendship friendship = friendshipRepository.findByUserIdAndFriendId(friendId, userId)
+            .orElseThrow(() -> new ResourceNotFoundException("Amistad no encontrada", ErrorCode.FRIENDSHIP_NOT_FOUND));
 
         sendFriendshipEvent(userId, friendId, FriendshipEventType.ACCEPTED);
         friendship.setAccepted(true);
