@@ -2,6 +2,9 @@ server:
     port: ${SERVER_PORT}
 
 spring:
+    config:
+        import: optional:file:.env[.properties]
+        
     application:
         name: authservice
 
@@ -66,6 +69,9 @@ springdoc:
         path: /swagger-ui.html 
     api-docs:
         path: /v3/api-docs
+
+api:
+    gateway-url: ${URL_APIGATEWAY}
 
 logging:
   level:

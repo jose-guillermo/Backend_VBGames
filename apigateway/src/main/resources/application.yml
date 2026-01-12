@@ -23,6 +23,10 @@ microservices:
 #             - name: Auth service
 #               url: /docs/authservice/v3/api-docs
 
+spring: 
+    config:
+        import: optional:file:.env[.properties]
+
 springdoc:
     api-docs:
         enabled: true

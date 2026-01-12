@@ -7,6 +7,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vbgames.backend.common.exceptions.RequestValidationException;
+
+import io.swagger.v3.oas.annotations.Operation;
+
+import com.vbgames.backend.authservice.dtos.LoginRequest;
 import com.vbgames.backend.authservice.dtos.RegisterRequest;
 import com.vbgames.backend.authservice.dtos.UserResponse;
 import com.vbgames.backend.authservice.services.JwtService;
@@ -31,7 +35,26 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class UserController {
 
     private final UserService userService;
+    
+    @Operation(
+        summary = "Verificar correo",
+        description = "Errores posibles:\n" +
+            "- 401 → TOKEN_EXPIRED"
+    )
+    @GetMapping("/verify/{token}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void verifyEmail(@PathVariable String token) {
+        userService.verifyEmail(token);
+    }
 
+    @Operation(
+        summary = "Registro de usuario",
+        description = "Errores posibles:\n" +
+            "- 400 → VALIDATION_ERROR\n" +
+            "- 401 → INVALID_CREDENTIALS\n" +
+            "- 409 → EMAIL_ALREADY_EXISTS\n" +
+            "- 409 → PENDING_EMAIL_VERIFICATION\n"
+    )
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public UserResponse registerUser(
@@ -43,16 +66,17 @@ public class UserController {
         return userService.registerUser(request);
     }
 
-    @GetMapping("/verify/{token}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void verifyEmail(@PathVariable String token) {
-        userService.verifyEmail(token);
-    }
-
+    @Operation(
+        summary = "Login de usuario",
+        description = "Errores posibles:\n" +
+            "- 400 → VALIDATION_ERROR\n" +
+            "- 401 → INVALID_CREDENTIALS\n" +
+            "- 401 → TOKEN_EXPIRED"
+    )
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
-    public void postMethodName(
-        @RequestBody @ConfirmPassword RegisterRequest request,
+    public void login(
+        @RequestBody LoginRequest request,
         BindingResult result,
         HttpServletResponse response
     ) {
@@ -60,9 +84,15 @@ public class UserController {
         userService.login(request, response);
     }
 
+    @Operation(
+        summary = "Renovar token",
+        description = "Errores posibles:\n" +
+            "- 401 → INVALID_CREDENTIALS\n" +
+            "- 401 → TOKEN_EXPIRED\n"
+    )
     @PostMapping("/refresh")
     @ResponseStatus(HttpStatus.OK)
-    public void postMethodName(
+    public void refresh(
         @CookieValue(name = JwtService.COOKIE_REFRESH_TOKEN) String refreshToken,
         HttpServletResponse response
     ) {

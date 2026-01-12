@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.vbgames.backend.authservice.dtos.LoginRequest;
 import com.vbgames.backend.authservice.dtos.RegisterRequest;
 import com.vbgames.backend.authservice.dtos.UserResponse;
 import com.vbgames.backend.authservice.entities.RefreshToken;
@@ -56,7 +57,7 @@ public class UserService {
     }
 
     @Transactional
-    public void login(RegisterRequest request, HttpServletResponse response) {
+    public void login(LoginRequest request, HttpServletResponse response) {
         User user = userRepository.findByEmail(request.getEmail())
             .orElseThrow(() -> new InvalidCredentialsException());
 
@@ -75,7 +76,6 @@ public class UserService {
 
         response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
         response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
-        System.out.println("refreshToken: " + refreshToken);
     }
 
     @Transactional

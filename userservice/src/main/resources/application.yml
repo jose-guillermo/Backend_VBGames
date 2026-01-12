@@ -2,6 +2,9 @@ server:
     port: ${SERVER_PORT}
 
 spring:
+    config:
+        import: optional:file:.env[.properties]
+
     jmx:
         enabled: false
 
@@ -27,7 +30,7 @@ spring:
         open-in-view: false
 
     kafka: 
-        bootstrap-servers: ${KAFKA_SERVER}
+        bootstrap-servers: ${KAFKA_SERVER:localhost:9092}
         consumer:
             auto-offset-reset: earliest
             group-id: user-service
@@ -46,4 +49,4 @@ jwt:
     access:
         private: ${JWT_ACCESS_PRIVATE}
     refresh:
-        private: ${JWT_REFRESH_PRIVATE}
+        private: ${JWT_REFRESH_PRIVATE}ç
