@@ -37,3 +37,6 @@ spring:
                     json:
                         trusted:
                             packages: "com.vbgames.backend.common.events"
+
+api:
+    gateway-url: ${URL_APIGATEWAY}

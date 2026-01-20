@@ -11,6 +11,7 @@ import com.vbgames.backend.productservice.dtos.PurchaseResponse;
 import com.vbgames.backend.productservice.dtos.CreateProductRequest;
 import com.vbgames.backend.productservice.services.ProductService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 
 import java.util.HashMap;
@@ -33,12 +34,22 @@ public class ProductController {
 
     private final ProductService productService;
 
+    @Operation(
+        summary = "Obtener productos"
+    )
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<ProductResponse> getProducts(@RequestHeader("X-User-Id") UUID userId) {
         return productService.getProducts(userId);
     }
 
+    @Operation(
+        summary = "Crear producto",
+        description = "Errores posibles:\n" +
+            "- 400 → VALIDATION_ERROR\n" +
+            "- 404 → GAME_NOT_FOUND" +
+            "- 409 → PRODUCT_ALREADY_EXISTS"
+    )
     @PostMapping("/{gameIdString}")
     @ResponseStatus(HttpStatus.CREATED)
     public ProductResponse createProduct(
@@ -53,9 +64,14 @@ public class ProductController {
         return productService.createProduct(productRequest, gameId);
     }
 
+    @Operation(
+        summary = "Comprar producto por id",
+        description = "Errores posibles:\n" +
+            "- 400 → VALIDATION_ERROR"
+    )
     @PostMapping("/{productIdString}/purchase")
     @ResponseStatus(HttpStatus.CREATED)
-    public PurchaseResponse postMethodName(
+    public PurchaseResponse purchaseProduct(
         @RequestHeader("X-User-Id") UUID userId,
         @PathVariable @IsUUID String productIdString
     ) {

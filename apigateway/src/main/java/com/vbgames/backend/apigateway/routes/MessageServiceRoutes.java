@@ -21,4 +21,17 @@ public class MessageServiceRoutes {
             )
             .build();
     }
+
+    @Bean
+    public RouteLocator messageServiceApiDocs(RouteLocatorBuilder builder) {
+        return builder.routes()
+            .route(r -> r
+                .path("/docs/messageservice/v3/api-docs")
+                .filters(f -> f
+                    .rewritePath("/docs/messageservice/v3/api-docs", "/v3/api-docs")
+                )
+                .uri(messageServiceUrl)
+            )
+            .build();
+    }
 }

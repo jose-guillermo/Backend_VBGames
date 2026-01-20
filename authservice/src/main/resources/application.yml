@@ -64,15 +64,6 @@ jwt:
     verify-email:
         secret: ${JWT_VERIFY_EMAIL_SECRET}
 
-springdoc:
-    swagger-ui:
-        path: /swagger-ui.html 
-    api-docs:
-        path: /v3/api-docs
-
-api:
-    gateway-url: ${URL_APIGATEWAY}
-
 logging:
   level:
     org:
@@ -82,3 +73,10 @@ logging:
                 descriptor:
                     sql:
                         BasicBinder: TRACE
+
+api:
+    gateway-url: ${URL_APIGATEWAY}
+
+admin:
+    email: ${ADMIN_EMAIL}
+    password: ${ADMIN_PASSWORD}

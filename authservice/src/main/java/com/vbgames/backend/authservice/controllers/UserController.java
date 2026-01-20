@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class UserController {
 
     private final UserService userService;
-    
+
     @Operation(
         summary = "Verificar correo",
         description = "Errores posibles:\n" +
@@ -97,9 +97,7 @@ public class UserController {
         HttpServletResponse response
     ) {
         userService.refresh(refreshToken, response);
-    }
-    
-    
+    } 
 
     private void validation(BindingResult result) {
         if (!result.hasFieldErrors()) return;

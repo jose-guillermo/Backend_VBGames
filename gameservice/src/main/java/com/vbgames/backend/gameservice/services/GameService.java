@@ -41,7 +41,7 @@ public class GameService{
         List<Piece> pieces = pieceMapper.toPieces(gameDto.getPieces(), game);
 
         game.setPieces(pieces);
-    
+
         sendGameEvent(game);
         return gameMapper.toGameResponse(game);
     }

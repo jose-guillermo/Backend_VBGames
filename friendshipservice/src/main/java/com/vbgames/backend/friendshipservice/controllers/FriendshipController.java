@@ -16,6 +16,7 @@ import com.vbgames.backend.common.validators.IsUUID;
 import com.vbgames.backend.friendshipservice.dtos.FriendResponse;
 import com.vbgames.backend.friendshipservice.services.FriendshipService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,24 +30,47 @@ public class FriendshipController {
 
     private final FriendshipService friendshipService;
 
+    @Operation(
+        summary = "Obtener lista de amigos"
+    )
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public ArrayList<FriendResponse> getFriends(@RequestHeader("X-User-Id") UUID userId) {
         return friendshipService.getFriends(userId);
     }
 
+    @Operation(
+        summary = "Enviar solicitud de amistad",
+        description = "Errores posibles:\n" +
+            "- 400 → VALIDATION_ERROR\n" +
+            "- 404 → USER_NOT_FOUND" +
+            "- 404 → FRIEND_NOT_FOUND" +
+            "- 409 → FRIENDSHIP_ALREADY_EXISTS"
+    )
     @PostMapping("/{friendId}")
     @ResponseStatus(HttpStatus.CREATED)
     public void addFriendship(@RequestHeader("X-User-Id") UUID userId, @PathVariable @IsUUID String friendId) {
         friendshipService.sendFrienshipRequest(userId, UUID.fromString(friendId));
     }
 
+    @Operation(
+        summary = "Eliminar amigo",
+        description = "Errores posibles:\n" +
+            "- 400 → VALIDATION_ERROR\n" +
+            "- 404 → FRIENDSHIP_NOT_FOUND" 
+    )
     @DeleteMapping("/{friendId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeFriendship(@RequestHeader("X-User-Id") UUID userId, @PathVariable @IsUUID String friendId) {
         friendshipService.removeFriendship(userId, UUID.fromString(friendId));
     }
 
+    @Operation(
+        summary = "Aceptar solicitud de amistad",
+        description = "Errores posibles:\n" +
+            "- 400 → VALIDATION_ERROR\n" +
+            "- 404 → FRIENDSHIP_NOT_FOUND" 
+    )
     @PatchMapping("/{friendId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void acceptFriendship(@RequestHeader("X-User-Id") UUID userId, @PathVariable @IsUUID String friendId) {

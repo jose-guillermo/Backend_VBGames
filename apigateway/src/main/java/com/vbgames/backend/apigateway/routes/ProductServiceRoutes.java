@@ -21,4 +21,17 @@ public class ProductServiceRoutes {
             )
             .build();
     }
+
+    @Bean
+    public RouteLocator productServiceApiDocs(RouteLocatorBuilder builder) {
+        return builder.routes()
+            .route(r -> r
+                .path("/docs/productservice/v3/api-docs")
+                .filters(f -> f
+                    .rewritePath("/docs/productservice/v3/api-docs", "/v3/api-docs")
+                )
+                .uri(productServiceUrl)
+            )
+            .build();
+    }
 }

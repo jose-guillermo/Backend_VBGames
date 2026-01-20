@@ -13,6 +13,7 @@ import com.vbgames.backend.userservice.dtos.UpdateUsernameRequest;
 import com.vbgames.backend.userservice.dtos.UserResponse;
 import com.vbgames.backend.userservice.services.UserService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -31,24 +32,43 @@ public class UserController {
 
     private final UserService userService;
 
+    @Operation(
+        summary = "Obtener usuario por id",
+        description = "Errores posibles:\n" +
+            "- 400 → VALIDATION_ERROR\n" +
+            "- 404 → USER_NOT_FOUND"
+    )
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public UserResponse getUser(@PathVariable @IsUUID String id) {
         return userService.getUser(UUID.fromString(id));
     }
 
+    @Operation(
+        summary = "Cambiar juego favorito",
+        description = "Errores posibles:\n" +
+            "- 400 → VALIDATION_ERROR\n" +
+            "- 404 → USER_NOT_FOUND\n" +
+            "- 404 → GAME_NOT_FOUND" 
+    )
     @PatchMapping("/favourite-game/{gameIdString}")
     @ResponseStatus(HttpStatus.OK)
     public UserResponse updateFavouriteGame(
         @PathVariable @IsUUID String gameIdString,
         @RequestHeader("X-User-Id") UUID userId
     ) {
-        System.out.println("gameIdString: " + gameIdString);
         UUID gameId = UUID.fromString(gameIdString);
 
         return userService.updateFavouriteGame(userId, gameId);
     }
 
+    @Operation(
+        summary = "Cambiar el nombre de usuario",
+        description = "Errores posibles:\n" +
+            "- 400 → VALIDATION_ERROR\n" +
+            "- 404 → USER_NOT_FOUND\n" +
+            "- 409 → USERNAME_ALREADY_EXISTS" 
+    )
     @PatchMapping("/update-username")
     @ResponseStatus(HttpStatus.OK)
     public UserResponse updateUsername(
@@ -61,6 +81,11 @@ public class UserController {
         return userService.updateUsername(request.getUsername(), userId);
     }
 
+    @Operation(
+        summary = "Cambiar el estado del usuario",
+        description = "Errores posibles:\n" +
+            "- 404 → USER_NOT_FOUND\n"
+    )
     @PatchMapping("/status")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void onlineOffline(@RequestHeader("X-User-Id") UUID userId) {

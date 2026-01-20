@@ -14,6 +14,7 @@ import com.vbgames.backend.messageservice.dtos.MessageResponse;
 import com.vbgames.backend.messageservice.dtos.SendMessageRequest;
 import com.vbgames.backend.messageservice.services.MessageService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -34,11 +35,21 @@ public class MessageController {
 
     private final MessageService messageService;
 
+    @Operation(
+        summary = "Obtener tus mensajes"
+    )
     @GetMapping
     public List<MessageResponse> getMessages(@RequestHeader("X-User-Id") UUID userId) {
         return messageService.getMessages(userId);
     }
 
+    @Operation(
+        summary = "Enviar mensaje",
+        description = "Errores posibles:\n" +
+            "- 400 → VALIDATION_ERROR\n" +
+            "- 404 → SENDER_NOT_FOUND" +
+            "- 404 → RECIPIENT_NOT_FOUND"
+    )
     @PostMapping("/{recipientId}")
     @ResponseStatus(HttpStatus.CREATED)
     public MessageResponse sendMessage(
@@ -52,12 +63,26 @@ public class MessageController {
         return messageService.sendMessage(senderId, UUID.fromString(recipientId), request);
     }
 
+    @Operation(
+        summary = "Marcar como leído",
+        description = "Errores posibles:\n" +
+            "- 400 → VALIDATION_ERROR\n" +
+            "- 403 → FORBIDDEN_ACTION\\n" + //
+            "- 404 → MESSAGE_NOT_FOUND" 
+    )
     @PatchMapping("/{messageId}/read")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void readMessage(@RequestHeader("X-User-Id") UUID userId, @PathVariable @IsUUID String messageId) {
         messageService.readMessage(userId, UUID.fromString(messageId));
     }
 
+    @Operation(
+        summary = "Eliminar mensaje",
+        description = "Errores posibles:\n" +
+            "- 400 → VALIDATION_ERROR\n" +
+            "- 403 → FORBIDDEN_ACTION\\n" + //
+            "- 404 → MESSAGE_NOT_FOUND" 
+    )
     @DeleteMapping("/{messageId}/delete")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteMessage(@RequestHeader("X-User-Id") UUID userId, @PathVariable @IsUUID String messageId) {

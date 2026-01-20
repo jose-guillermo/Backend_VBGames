@@ -32,9 +32,8 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public List<ProductResponse> getProducts(UUID userId) {
-        System.out.println("antes de cargar los productos");
         List<Product> products = (List<Product>) productRepository.findAllWithUsers();
-        System.out.println("hola, comprobar que se ejecuta antes de cargar a los games ");
+        
         // Compruebo si el producto pertenece al usuario
         return products.stream()
             .map( product -> {
@@ -54,8 +53,6 @@ public class ProductService {
             throw new DuplicateResourceException("Ya existe un producto con ese nombre", ErrorCode.PRODUCT_ALREADY_EXISTS);
         
         Product product = productMapper.toProduct(productDto);
-
-        System.out.println("Saving game: " + game);
 
         product.setGame(game);
 

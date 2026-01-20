@@ -21,4 +21,17 @@ public class FriendshipServiceRoutes {
             )
             .build();
     }
+
+    @Bean
+    public RouteLocator friendshipServiceApiDocs(RouteLocatorBuilder builder) {
+        return builder.routes()
+            .route(r -> r
+                .path("/docs/friendshipservice/v3/api-docs")
+                .filters(f -> f
+                    .rewritePath("/docs/friendshipservice/v3/api-docs", "/v3/api-docs")
+                )
+                .uri(friendshipServiceUrl)
+            )
+            .build();
+    }
 }

@@ -13,6 +13,7 @@ import com.vbgames.backend.authservice.entities.User;
 public interface UserRepository extends CrudRepository<User, UUID> {
 
     Optional<User> findByEmail(String email);
+    Boolean existsByEmail(String email);
     
     @Query(value = "DELETE FROM users WHERE expires_at < :now", nativeQuery = true)
     void deleteExpiredUsers(Long now);

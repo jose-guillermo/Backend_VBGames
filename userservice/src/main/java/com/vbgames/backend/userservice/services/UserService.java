@@ -11,6 +11,7 @@ import com.vbgames.backend.common.enums.ErrorCode;
 import com.vbgames.backend.common.events.UserCoinsUpdatedEvent;
 import com.vbgames.backend.common.events.UserCreatedEvent;
 import com.vbgames.backend.common.events.UsernameUpdatedEvent;
+import com.vbgames.backend.common.exceptions.DuplicateResourceException;
 import com.vbgames.backend.common.exceptions.ResourceNotFoundException;
 import com.vbgames.backend.userservice.dtos.UserResponse;
 import com.vbgames.backend.userservice.entities.Game;
@@ -44,7 +45,18 @@ public class UserService {
     public UserResponse updateUsername(String username, UUID userId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado", ErrorCode.USER_NOT_FOUND));
+        
+        if (username.equals(user.getUsername()))
+            return userMapper.toUserResponse(user);
 
+        userRepository.findByUsername(username)
+            .ifPresent(u -> {
+                throw new DuplicateResourceException(
+                    "Ya existe un usuario con ese nombre de usuario",
+                    ErrorCode.USERNAME_ALREADY_EXISTS
+                );
+            });
+           
         user.setUsername(username);
 
         sendUserEvent(user);
@@ -58,7 +70,7 @@ public class UserService {
             .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado", ErrorCode.USER_NOT_FOUND));
         Game game = gameRepository.findById(gameId)
             .orElseThrow(() -> new ResourceNotFoundException("Juego no encontrado", ErrorCode.GAME_NOT_FOUND));
-
+        
         user.setFavouriteGame(game);
 
         return userMapper.toUserResponse(user);

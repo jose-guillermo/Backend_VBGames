@@ -50,3 +50,15 @@ jwt:
         private: ${JWT_ACCESS_PRIVATE}
     refresh:
         private: ${JWT_REFRESH_PRIVATE}ç
+
+springdoc:
+    swagger-ui:
+        path: /swagger-ui.html 
+    api-docs:
+        path: /v3/api-docs
+
+admin:
+    email: ${ADMIN_EMAIL}
+
+api:
+    gateway-url: ${URL_APIGATEWAY}

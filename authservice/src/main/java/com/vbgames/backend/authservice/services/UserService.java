@@ -64,6 +64,9 @@ public class UserService {
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) 
             throw new InvalidCredentialsException();
 
+        if(!user.isVerified())
+            throw new InvalidCredentialsException();
+
         List<String> roles = user.getRoles().stream().map(Role::getName).toList();
         String accessToken = jwtService.createAccessToken(user.getId().toString(), roles);
         String refreshToken = jwtService.createRefreshToken(user.getId().toString());

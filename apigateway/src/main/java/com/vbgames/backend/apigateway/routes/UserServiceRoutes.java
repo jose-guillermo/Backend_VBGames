@@ -19,14 +19,19 @@ public class UserServiceRoutes {
                 .path("/users/**")
                 .uri(userServiceUrl)
             )
-            // .route(r -> r
-            //     .path("/login")
-            //     .uri(userServiceUrl)
-            // )
-            // .route(r -> r
-            //     .path("/refresh")
-            //     .uri(userServiceUrl)
-            // )
+            .build();
+    }
+
+    @Bean
+    public RouteLocator userServiceApiDocs(RouteLocatorBuilder builder) {
+        return builder.routes()
+            .route(r -> r
+                .path("/docs/userservice/v3/api-docs")
+                .filters(f -> f
+                    .rewritePath("/docs/userservice/v3/api-docs", "/v3/api-docs")
+                )
+                .uri(userServiceUrl)
+            )
             .build();
     }
 }

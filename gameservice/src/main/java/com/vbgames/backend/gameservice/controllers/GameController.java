@@ -9,6 +9,7 @@ import com.vbgames.backend.gameservice.dtos.GameResponse;
 import com.vbgames.backend.gameservice.dtos.GameUpdateRequest;
 import com.vbgames.backend.gameservice.services.GameService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -35,6 +36,12 @@ public class GameController {
 
     private final GameService gameService;
 
+    @Operation(
+        summary = "Crear juego",
+        description = "Errores posibles:\n" +
+            "- 400 → VALIDATION_ERROR\n" +
+            "- 409 → GAME_ALREADY_EXISTS"
+    )
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public GameResponse create(@Valid @RequestBody GameCreateRequest gameDto, BindingResult result) {
@@ -42,12 +49,22 @@ public class GameController {
         return gameService.create(gameDto);
     }
 
+    @Operation(
+        summary = "Conseguir todos los juegos"
+    )
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<GameResponse> getGames() {
         return Collections.unmodifiableList(gameService.getAll());
     }
 
+    @Operation(
+        summary = "Actualizar juego por id",
+        description = "Errores posibles:\n" +
+            "- 400 → VALIDATION_ERROR\n" +
+            "- 404 → GAME_NOT_FOUND\n" +
+            "- 409 → GAME_ALREADY_EXISTS"
+    )
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public GameResponse update(@Valid @RequestBody GameUpdateRequest gameDto, BindingResult result, @Valid @PathVariable @IsUUID String id) {
