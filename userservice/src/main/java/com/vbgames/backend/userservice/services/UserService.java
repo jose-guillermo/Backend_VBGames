@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vbgames.backend.common.enums.ErrorCode;
+import com.vbgames.backend.common.events.ProductPurchasedEvent;
 import com.vbgames.backend.common.events.UserCoinsUpdatedEvent;
 import com.vbgames.backend.common.events.UserCreatedEvent;
 import com.vbgames.backend.common.events.UsernameUpdatedEvent;
@@ -32,7 +33,7 @@ public class UserService {
     private final GameRepository gameRepository;
     private final RoleRepository roleRepository;
     private final UserMapper userMapper;
-    private final KafkaTemplate<String, UsernameUpdatedEvent> kafkaTemplate;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @Transactional(readOnly = true)
     public UserResponse getUser(UUID id) {
@@ -59,7 +60,7 @@ public class UserService {
            
         user.setUsername(username);
 
-        sendUserEvent(user);
+        sendUserUpdated(user);
 
         return userMapper.toUserResponse(user);
     }
@@ -84,16 +85,20 @@ public class UserService {
         user.setOnline(!user.isOnline());
     }
 
-    @KafkaListener(topics = "user.coins.updated")
+    @KafkaListener(topics = "product.purchased")
     @Transactional
-    public void handleUpdateCoinsEvent(UserCoinsUpdatedEvent event) {
-        userRepository.findById(event.getId())
-            .ifPresent(user -> user.setCoins(event.getCoins()));
+    public void handleProductPurchased(ProductPurchasedEvent event) {
+        User user = userRepository.findById(event.getUserId())
+            .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado para evento", ErrorCode.USER_NOT_FOUND));
+        
+        user.setCoins(user.getCoins() - event.getPrice());
+        
+        sendUserCoinsUpdated(user);
     }
 
     @KafkaListener(topics = "user.created")
     @Transactional
-    public void handleUserCreatedEvent(UserCreatedEvent event) {
+    public void handleUserCreated(UserCreatedEvent event) {
         User user = userMapper.toUser(event);
         user = userRepository.save(user);
 
@@ -102,9 +107,15 @@ public class UserService {
         user.getRoles().add(userRole);
     }
 
-    private void sendUserEvent(User user) {
+    private void sendUserUpdated(User user) {
         UsernameUpdatedEvent event = userMapper.toUsernameUpdatedEvent(user);
 
-        kafkaTemplate.send("username.updated", event);
+        kafkaTemplate.send("user.username.updated", event);
+    }
+
+    private void sendUserCoinsUpdated(User user) {
+        UserCoinsUpdatedEvent event = userMapper.toUserCoinsUpdatedEvent(user);
+
+        kafkaTemplate.send("user.coins.updated", event);
     }
 }

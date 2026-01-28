@@ -35,7 +35,7 @@ public class UserService {
 
     @KafkaListener(topics = "user.created")
     @Transactional
-    public void handleUserEvent(UserCreatedEvent event) {
+    public void handleUserCreated(UserCreatedEvent event) {
         User user = userMapper.toUser(event);
 
         User newUser = userRepository.save(user);
@@ -48,9 +48,9 @@ public class UserService {
         messageService.sendMessage(this.systemUserId, newUser.getId(), request);
     }
 
-    @KafkaListener(topics = "username.updated")
+    @KafkaListener(topics = "user.username.updated")
     @Transactional
-    public void handleUserEvent(UsernameUpdatedEvent event) {
+    public void handleUsernameUpdated(UsernameUpdatedEvent event) {
         User user = userMapper.toUser(event);
         
         userRepository.save(user);

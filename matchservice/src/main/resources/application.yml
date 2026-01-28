@@ -1,0 +1,42 @@
+server:
+    port: ${SERVER_PORT}
+
+spring:
+    config:
+        import: optional:file:.env[.properties]
+    application:
+        name: messageservice
+
+    datasource:
+        url: ${DB_URL}
+        username: ${DB_USER}
+        password: ${DB_PASSWORD}
+        driver-class-name: org.postgresql.Driver
+
+    flyway:
+        enabled: true
+        locations: classpath:db/migration
+        baseline-on-migrate: true
+        validate-on-migrate: false
+    
+    jpa:
+        hibernate:
+            ddl-auto: none
+        show-sql: true
+        open-in-view: false
+
+    kafka:
+        bootstrap-servers: ${KAFKA_SERVER}
+        consumer:
+            auto-offset-reset: earliest
+            group-id: match-service
+            key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+            value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+            properties:
+                spring:
+                    json:
+                        trusted:
+                            packages: "com.vbgames.backend.common.events"
+
+api:
+    gateway-url: ${URL_APIGATEWAY}

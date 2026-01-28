@@ -1,7 +1,7 @@
 package com.vbgames.backend.authservice;
 
 import java.util.Set;
-import java.util.ArrayList;
+import java.util.HashSet;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
@@ -46,7 +46,7 @@ public class AdminInitializer implements ApplicationRunner {
         admin.setEmail(adminEmail);
         admin.setPassword(passwordEncoder.encode(adminPassword));
         admin.setVerified(true);
-        admin.setRoles(new ArrayList<>(Set.of(userRole, adminRole)));
+        admin.setRoles(new HashSet<>(Set.of(userRole, adminRole)));
         userRepository.save(admin);
     }
 }

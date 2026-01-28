@@ -20,7 +20,7 @@ public class GameService {
 
     @KafkaListener(topics = "game.upserted")
     @Transactional
-    public void handleGameEvent(GameUpsertedEvent event) {
+    public void handleGameUpserted(GameUpsertedEvent event) {
         Game game = gameMapper.toGame(event);
 
         gameRepository.save(game);

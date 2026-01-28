@@ -3,7 +3,6 @@ package com.vbgames.backend.productservice.services;
 import java.util.UUID;
 
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,27 +26,33 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final KafkaTemplate<String, UserCoinsUpdatedEvent> kafkaTemplate;
 
     @KafkaListener(topics = "user.created")
     @Transactional
-    public void handleUserEvent(UserCreatedEvent event) {
+    public void handleUserCreated(UserCreatedEvent event) {
         User user = userMapper.toUser(event);
         userRepository.save(user);
     }
 
-    @KafkaListener(topics = "username.updated")
+    @KafkaListener(topics = "user.username.updated")
     @Transactional
-    public void handleUserEvent(UsernameUpdatedEvent event) {
+    public void handleUsernameUpdated(UsernameUpdatedEvent event) {
         User user = userRepository.findById(event.getId()).get();
         user.setUsername(event.getUsername());
+    }
+
+    @KafkaListener(topics = "user.coins.updated")
+    @Transactional
+    public void handleUserCoinsUpdated(UserCoinsUpdatedEvent event) {
+        User user = userRepository.findById(event.getId()).get();
+        user.setCoins(event.getCoins());
     }
 
     @Transactional
     public User buyProduct(UUID userId, Product product) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado", ErrorCode.USER_NOT_FOUND));
-        
+
         if (user.getProducts().contains(product))
             throw new ProductAlreadyOwnedException("Ya tienes este producto"); 
 
@@ -58,13 +63,6 @@ public class UserService {
 
         user.getProducts().add(product);
 
-        sendUpdateCoinsEvent(user);
-
         return user;
-    }
-
-    private void sendUpdateCoinsEvent(User user) {
-        UserCoinsUpdatedEvent updateCoinsEvent = userMapper.toUpdateCoinsEvent(user);
-        kafkaTemplate.send("user.coins.updated", updateCoinsEvent);
     }
 }

@@ -3,10 +3,12 @@ package com.vbgames.backend.productservice.services;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vbgames.backend.common.enums.ErrorCode;
+import com.vbgames.backend.common.events.ProductPurchasedEvent;
 import com.vbgames.backend.common.exceptions.DuplicateResourceException;
 import com.vbgames.backend.common.exceptions.ResourceNotFoundException;
 import com.vbgames.backend.productservice.dtos.ProductResponse;
@@ -29,6 +31,7 @@ public class ProductService {
     private final ProductMapper productMapper;
     private final GameRepository gameRepository;
     private final UserService userService;
+    private final KafkaTemplate<String, ProductPurchasedEvent> kafkaTemplate;
 
     @Transactional(readOnly = true)
     public List<ProductResponse> getProducts(UUID userId) {
@@ -68,6 +71,14 @@ public class ProductService {
   
         User user = userService.buyProduct(userId, product);
 
+        sendProductPurchased(product, user);
+
         return new PurchaseResponse(productMapper.toProductResponse(product, true), user.getCoins());
+    }
+
+     private void sendProductPurchased(Product product, User user) {
+        ProductPurchasedEvent event = productMapper.toProductPurchasedEvent(product, user);
+
+        kafkaTemplate.send("product.pruchased", event);
     }
 }
