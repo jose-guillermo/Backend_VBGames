@@ -56,6 +56,7 @@ public class JwtAccessTokenValidationFilter implements WebFilter{
                     .header("X-User-Id", userId)
                     .build();
 
+            System.out.println("userId: " + userId);
             return chain.filter(exchange.mutate().request(mutatedRequest).build())
                 .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
 

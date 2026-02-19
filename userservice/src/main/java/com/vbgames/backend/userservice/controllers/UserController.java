@@ -81,17 +81,6 @@ public class UserController {
         return userService.updateUsername(request.getUsername(), userId);
     }
 
-    @Operation(
-        summary = "Cambiar el estado del usuario",
-        description = "Errores posibles:\n" +
-            "- 404 → USER_NOT_FOUND\n"
-    )
-    @PatchMapping("/status")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void onlineOffline(@RequestHeader("X-User-Id") UUID userId) {
-        userService.onlineOffline(userId);
-    }
-
     private void validation(BindingResult result) {
         if (!result.hasFieldErrors()) return;
         

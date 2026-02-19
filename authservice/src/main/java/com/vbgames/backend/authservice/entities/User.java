@@ -2,8 +2,8 @@ package com.vbgames.backend.authservice.entities;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.hibernate.annotations.JdbcTypeCode;
@@ -22,11 +22,13 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "users")
-@Data
+@Getter
+@Setter
 public class User {
 
     @Id
@@ -45,10 +47,10 @@ public class User {
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private Set<Role> roles;
+    private List<Role> roles = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<RefreshToken> refreshTokens = new HashSet<>();
+    private List<RefreshToken> refreshTokens = new ArrayList<>();
 
     private boolean verified;
 
@@ -56,7 +58,6 @@ public class User {
     private Long expiresAt;
 
     public User(){
-        this.roles = new HashSet<>();
         this.expiresAt = Instant.now().plus(20, ChronoUnit.MINUTES).toEpochMilli();
     }
 
@@ -64,7 +65,6 @@ public class User {
         this.password = password;
         this.email = email;
         this.verified = false;
-        this.roles = new HashSet<>();
         this.expiresAt = Instant.now().plus(20, ChronoUnit.MINUTES).toEpochMilli();
     }
 

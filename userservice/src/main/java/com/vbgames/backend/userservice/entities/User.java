@@ -10,22 +10,22 @@ import org.hibernate.type.SqlTypes;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "users")
-@Data
+@Getter
+@Setter
 public class User {
 
     @Id
-    @GeneratedValue
     @JdbcTypeCode(SqlTypes.UUID)
     private UUID id;
     
@@ -49,17 +49,15 @@ public class User {
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private List<Role> roles;
+    private List<Role> roles = new ArrayList<>();
 
     public User(){
         this.creationDateEpoch = Instant.now().toEpochMilli();
-        this.roles = new ArrayList<>();
     }
 
     public User(String username, String email) {
         this.username = username;
         this.email = email;
         this.creationDateEpoch = Instant.now().toEpochMilli();
-        this.roles = new ArrayList<>();
     }
 }

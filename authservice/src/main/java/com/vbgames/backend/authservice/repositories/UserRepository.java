@@ -3,6 +3,7 @@ package com.vbgames.backend.authservice.repositories;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -17,4 +18,11 @@ public interface UserRepository extends CrudRepository<User, UUID> {
     
     @Query(value = "DELETE FROM users WHERE expires_at < :now", nativeQuery = true)
     void deleteExpiredUsers(Long now);
+
+    @Modifying
+    @Query(value = 
+        "INSERT INTO users (id, email, password, verified, expires_at) VALUES (:id, :email, :password, :verified, :expiresAt)", 
+        nativeQuery = true
+    )
+    void insertAdmin(UUID id, String email, String password, boolean verified, Long expiresAt);
 }

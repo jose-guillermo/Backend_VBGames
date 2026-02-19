@@ -35,17 +35,8 @@ public interface FriendshipRepository extends CrudRepository<Friendship, Friends
     )
     List<FriendResponse> findAllFriendsByUserId(@Param("userId") UUID userId);
     
-    @Modifying
-    @Query(value = """
-        DELETE FROM friendships
-        WHERE (user_id_1 = :userId AND user_id_2 = :friendId)
-        OR (user_id_1 = :friendId AND user_id_2 = :userId)
-        """, 
-        nativeQuery = true
-    )
-    int deleteByUserIdAndFriendId(@Param("userId") UUID userId, @Param("friendId") UUID friendId);
-
-    @Query(value = """
+    @Query(
+        value = """
         SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END
         FROM friendships
         WHERE (user_id_1 = :user1Id AND user_id_2 = :user2Id)
@@ -55,7 +46,16 @@ public interface FriendshipRepository extends CrudRepository<Friendship, Friends
     )
     Boolean existsByUsers(UUID user1Id, UUID user2Id);
 
-    Optional<Friendship> findByUserIdAndFriendId(UUID userId, UUID friendId);
+    @Query(
+        value = """
+        SELECT *
+        FROM friendships
+        WHERE (user_id_1 = :user1Id AND user_id_2 = :user2Id)
+        OR (user_id_1 = :user2Id AND user_id_2 = :user1Id)
+        """,
+        nativeQuery = true
+    )
+    Optional<Friendship> findBetweenUsers(UUID user1Id, UUID user2Id);
 
     @Modifying
     @Query(value = "DELETE FROM friendships WHERE accepted = false AND created_at < :timestamp", nativeQuery = true)

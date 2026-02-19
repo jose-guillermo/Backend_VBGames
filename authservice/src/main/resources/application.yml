@@ -42,10 +42,10 @@ spring:
             key-serializer: org.apache.kafka.common.serialization.StringSerializer
             value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     mail:
-        host: smtp.sendgrid.net
-        port: 587
-        username: apikey
-        password: ${MAIL_APIKEY}
+        host: ${SMTP_HOST}
+        port: ${SMTP_PORT}
+        username: ${SMTP_USERNAME}
+        password: ${SMTP_PASSWORD}
         properties:
             mail:
                 smtp:

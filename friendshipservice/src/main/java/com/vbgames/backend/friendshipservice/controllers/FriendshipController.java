@@ -50,7 +50,7 @@ public class FriendshipController {
     @PostMapping("/{friendId}")
     @ResponseStatus(HttpStatus.CREATED)
     public void addFriendship(@RequestHeader("X-User-Id") UUID userId, @PathVariable @IsUUID String friendId) {
-        friendshipService.sendFrienshipRequest(userId, UUID.fromString(friendId));
+        friendshipService.sendFriendshipRequest(userId, UUID.fromString(friendId));
     }
 
     @Operation(

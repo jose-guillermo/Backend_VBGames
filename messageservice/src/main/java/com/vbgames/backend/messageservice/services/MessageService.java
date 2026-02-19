@@ -4,11 +4,13 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vbgames.backend.common.enums.ErrorCode;
-import com.vbgames.backend.common.events.FriendshipCreatedEvent;
+import com.vbgames.backend.common.events.FriendshipEvent;
+import com.vbgames.backend.common.events.MessageSentEvent;
 import com.vbgames.backend.common.exceptions.ForbiddenActionException;
 import com.vbgames.backend.common.exceptions.ResourceNotFoundException;
 import com.vbgames.backend.messageservice.dtos.MessageResponse;
@@ -29,6 +31,7 @@ public class MessageService {
     private final MessageRepository messageRepository;
     private final MessageMapper messageMapper;
     private final UserRepository userRepository;
+    private final KafkaTemplate<String, MessageSentEvent> kafkaTemplate;
 
     @Transactional(readOnly = true)
     public List<MessageResponse> getMessages(UUID userId) {
@@ -47,6 +50,7 @@ public class MessageService {
 
         message = messageRepository.save(message);
 
+        sendMessageSent(message);
         return messageMapper.toMessageResponse(message);        
     }
 
@@ -74,11 +78,11 @@ public class MessageService {
 
     @KafkaListener(topics = "friendship.events")
     @Transactional
-    public void handleFriendshipRequestSent(FriendshipCreatedEvent event) {
+    public void handleFriendshipRequestSent(FriendshipEvent event) {
         String title = "";
         String body = "";
         switch (event.getType()) {
-            case REQUEST -> {
+            case REQUESTED -> {
                 title = "MESSAGES.FRIENDSHIP_REQUEST.TITLE";
                 body = "MESSAGES.FRIENDSHIP_REQUEST.BODY";
             }
@@ -86,8 +90,16 @@ public class MessageService {
                 title = "MESSAGES.FRIENDSHIP_ACCEPTED.TITLE";
                 body = "MESSAGES.FRIENDSHIP_ACCEPTED.BODY";
             }
+            case REMOVED -> {
+                return; // No se necestia mensaje
+            }
         }
         SendMessageRequest request = new SendMessageRequest(title, body, MessageType.FRIENDSHIP_REQUEST);
         sendMessage(event.getSenderId(), event.getRecipientId(), request);
     }
+
+    private void sendMessageSent(Message message){
+        MessageSentEvent event = new MessageSentEvent(message.getId(), message.getRecipient().getId());
+        kafkaTemplate.send("message.sent", event);
+    };
 }

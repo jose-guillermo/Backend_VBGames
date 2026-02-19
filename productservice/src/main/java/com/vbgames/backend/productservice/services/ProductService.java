@@ -76,9 +76,9 @@ public class ProductService {
         return new PurchaseResponse(productMapper.toProductResponse(product, true), user.getCoins());
     }
 
-     private void sendProductPurchased(Product product, User user) {
+    private void sendProductPurchased(Product product, User user) {
         ProductPurchasedEvent event = productMapper.toProductPurchasedEvent(product, user);
 
-        kafkaTemplate.send("product.pruchased", event);
+        kafkaTemplate.send("product.purchased", event);
     }
 }

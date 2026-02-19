@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.vbgames.backend.common.enums.ErrorCode;
 import com.vbgames.backend.common.enums.FriendshipEventType;
-import com.vbgames.backend.common.events.FriendshipCreatedEvent;
+import com.vbgames.backend.common.events.FriendshipEvent;
 import com.vbgames.backend.common.exceptions.DuplicateResourceException;
 import com.vbgames.backend.common.exceptions.ResourceNotFoundException;
 import com.vbgames.backend.friendshipservice.dtos.FriendResponse;
@@ -30,7 +30,7 @@ public class FriendshipService {
 
     private final UserRepository userRepository;
     private final FriendshipRepository friendshipRepository;
-    private final KafkaTemplate<String, FriendshipCreatedEvent> kafkaTemplate;
+    private final KafkaTemplate<String, FriendshipEvent> kafkaTemplate;
 
     @Transactional(readOnly = true)
     public ArrayList<FriendResponse> getFriends(UUID userId) {
@@ -38,7 +38,7 @@ public class FriendshipService {
     }
 
     @Transactional
-    public void sendFrienshipRequest(UUID userId, UUID friendId) {
+    public void sendFriendshipRequest(UUID userId, UUID friendId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado", ErrorCode.USER_NOT_FOUND));
         User friend = userRepository.findById(friendId)
@@ -50,40 +50,49 @@ public class FriendshipService {
         if(friendshipRepository.existsByUsers(userId, friendId)) 
             throw new DuplicateResourceException("Amistad ya existente", ErrorCode.FRIENDSHIP_ALREADY_EXISTS);
 
-        sendFriendshipEvent(userId, friendId, FriendshipEventType.REQUEST);
-
         Friendship friendship = new Friendship(user, friend);
         friendshipRepository.save(friendship);
+
+        sendFriendshipEvent(userId, friendId, FriendshipEventType.REQUESTED);
     }
 
     @Transactional
     public void removeFriendship(UUID userId, UUID friendId) {
-        int deleted = friendshipRepository.deleteByUserIdAndFriendId(userId, friendId);
+        Friendship friendship = friendshipRepository
+            .findBetweenUsers(userId, friendId)
+            .orElseThrow(() ->
+                new ResourceNotFoundException("Amistad no encontrada",
+                    ErrorCode.FRIENDSHIP_NOT_FOUND)
+            );
 
-        if (deleted == 0) {
-            throw new ResourceNotFoundException("Amistad no encontrada", ErrorCode.FRIENDSHIP_NOT_FOUND);
+        boolean wasAccepted = friendship.isAccepted();
+
+        friendshipRepository.delete(friendship);
+
+        if (!wasAccepted) {
+            sendFriendshipEvent(userId, friendId, FriendshipEventType.REMOVED);
         }
     }
 
     @Transactional
     public void acceptFriendship(UUID userId, UUID friendId) {
-        Friendship friendship = friendshipRepository.findByUserIdAndFriendId(friendId, userId)
+        Friendship friendship = friendshipRepository.findBetweenUsers(friendId, userId)
             .orElseThrow(() -> new ResourceNotFoundException("Amistad no encontrada", ErrorCode.FRIENDSHIP_NOT_FOUND));
 
-        sendFriendshipEvent(userId, friendId, FriendshipEventType.ACCEPTED);
         friendship.setAccepted(true);
+        sendFriendshipEvent(userId, friendId, FriendshipEventType.ACCEPTED);
     }
 
     @Transactional
     @Scheduled(cron = "0 0 0 * * *")
     public void deleteExpiredFriendships() {
-        long thirstyDaysAgo = Instant.now().minus(30, ChronoUnit.DAYS).toEpochMilli();
+        long thirtyDaysAgo = Instant.now().minus(30, ChronoUnit.DAYS).toEpochMilli();
 
-        friendshipRepository.deleteExpiredFriendships(thirstyDaysAgo);
+        friendshipRepository.deleteExpiredFriendships(thirtyDaysAgo);
     }
 
     private void sendFriendshipEvent(UUID senderId, UUID recipientId, FriendshipEventType type) {
-        FriendshipCreatedEvent event = new FriendshipCreatedEvent(senderId, recipientId, type);
+        FriendshipEvent event = new FriendshipEvent(senderId, recipientId, type);
         kafkaTemplate.send("friendship.events", event);
     }
 }

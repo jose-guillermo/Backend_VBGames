@@ -1,6 +1,7 @@
 package com.vbgames.backend.userservice;
 
 import java.util.Set;
+import java.util.UUID;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -36,7 +37,9 @@ public class AdminInitializer implements ApplicationRunner {
         Role adminRole = roleRepository.findByName("ROLE_ADMIN").get();
         Role userRole = roleRepository.findByName("ROLE_USER").get();
 
+        UUID id = UUID.fromString("00000000-0000-0000-0000-000000000001");
         User admin = new User();
+        admin.setId(id);
         admin.setEmail(adminEmail);
         admin.setUsername("admin");
         admin.setRoles(new ArrayList<>(Set.of(userRole, adminRole)));

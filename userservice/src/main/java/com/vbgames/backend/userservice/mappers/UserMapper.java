@@ -14,7 +14,6 @@ import com.vbgames.backend.userservice.entities.User;
 public interface UserMapper {
 
     @Mapping(target = "coins", ignore = true)
-    @Mapping(target = "id", ignore = true) 
     @Mapping(target = "online", ignore = true)
     @Mapping(target = "favouriteGame", ignore = true)
     @Mapping(target = "roles", ignore = true)

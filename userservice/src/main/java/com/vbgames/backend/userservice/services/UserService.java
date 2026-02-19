@@ -11,6 +11,7 @@ import com.vbgames.backend.common.enums.ErrorCode;
 import com.vbgames.backend.common.events.ProductPurchasedEvent;
 import com.vbgames.backend.common.events.UserCoinsUpdatedEvent;
 import com.vbgames.backend.common.events.UserCreatedEvent;
+import com.vbgames.backend.common.events.UserStatusChangedEvent;
 import com.vbgames.backend.common.events.UsernameUpdatedEvent;
 import com.vbgames.backend.common.exceptions.DuplicateResourceException;
 import com.vbgames.backend.common.exceptions.ResourceNotFoundException;
@@ -77,14 +78,6 @@ public class UserService {
         return userMapper.toUserResponse(user);
     }
 
-    @Transactional
-    public void onlineOffline(UUID userId) {
-        User user = userRepository.findById(userId)
-            .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado", ErrorCode.USER_NOT_FOUND));
-
-        user.setOnline(!user.isOnline());
-    }
-
     @KafkaListener(topics = "product.purchased")
     @Transactional
     public void handleProductPurchased(ProductPurchasedEvent event) {
@@ -105,6 +98,16 @@ public class UserService {
         Role userRole = roleRepository.findByName("ROLE_USER").get();
 
         user.getRoles().add(userRole);
+    }
+
+    @KafkaListener(topics = "user.status.changed")
+    @Transactional
+    public void handleUserStatusChanged(UserStatusChangedEvent event) {
+        User user = userRepository.findById(event.getId())
+            .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado para evento", ErrorCode.USER_NOT_FOUND));
+
+        user.setOnline(event.getOnline());
+
     }
 
     private void sendUserUpdated(User user) {

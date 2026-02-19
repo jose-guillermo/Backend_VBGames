@@ -16,11 +16,13 @@ microservices:
         url: ${AUTH_SERVICE_URL}
     match-service:
         url: ${MATCH_SERVICE_URL}
+    realtime-service:
+        url: ${REALTIME_SERVICE_URL}
 
 spring: 
     config:
         import: optional:file:.env[.properties]
-
+    
 springdoc:
     swagger-ui:
         config-url: /v3/api-docs/swagger-config

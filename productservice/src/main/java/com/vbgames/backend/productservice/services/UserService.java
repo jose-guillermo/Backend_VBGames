@@ -59,7 +59,7 @@ public class UserService {
         if (user.getCoins() < product.getPrice())
             throw new InsufficientCoinsException("No tienes suficientes monedas para comprar este producto");
    
-        user.setCoins(user.getCoins() - product.getPrice());
+        // user.setCoins(user.getCoins() - product.getPrice());
 
         user.getProducts().add(product);
 

@@ -4,6 +4,7 @@ server:
 spring:
     config:
         import: optional:file:.env[.properties]
+        
     application:
         name: messageservice
 
@@ -37,6 +38,9 @@ spring:
                     json:
                         trusted:
                             packages: "com.vbgames.backend.common.events"
+        producer:
+            key-serializer: org.apache.kafka.common.serialization.StringSerializer
+            value-serializer: org.springframework.kafka.support.serializer.JsonSerializer            
 
 api:
     gateway-url: ${URL_APIGATEWAY}

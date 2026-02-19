@@ -8,3 +8,4 @@ CREATE DATABASE authservice;
 CREATE DATABASE matchservice;
 CREATE DATABASE ratingservice;
 CREATE DATABASE achievementservice;
+CREATE DATABASE realtimeservice;
