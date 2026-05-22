@@ -32,7 +32,7 @@ public class User {
     private String username;
 
     private String email;
-    private int coins;
+    private int coins = 100;
 
     @Column(name = "created_at")
     private long creationDateEpoch;

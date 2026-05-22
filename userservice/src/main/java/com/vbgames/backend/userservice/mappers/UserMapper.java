@@ -6,7 +6,8 @@ import org.mapstruct.Mapping;
 import com.vbgames.backend.common.events.UserCoinsUpdatedEvent;
 import com.vbgames.backend.common.events.UserCreatedEvent;
 import com.vbgames.backend.common.events.UsernameUpdatedEvent;
-import com.vbgames.backend.userservice.dtos.UserResponse;
+import com.vbgames.backend.userservice.dtos.UserPrivateResponse;
+import com.vbgames.backend.userservice.dtos.UserPublicResponse;
 import com.vbgames.backend.userservice.entities.Role;
 import com.vbgames.backend.userservice.entities.User;
 
@@ -21,7 +22,9 @@ public interface UserMapper {
     @Mapping(target = "username", ignore = true)
     User toUser(UserCreatedEvent user);
 
-    UserResponse toUserResponse(User user);
+    UserPublicResponse toUserPublicResponse(User user);
+
+    UserPrivateResponse toUserPrivateResponse(User user);
 
     UsernameUpdatedEvent toUsernameUpdatedEvent(User user);
 

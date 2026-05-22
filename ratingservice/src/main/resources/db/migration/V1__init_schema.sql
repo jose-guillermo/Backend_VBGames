@@ -1,0 +1,22 @@
+DROP TABLE IF EXISTS games CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS ratings CASCADE;
+
+CREATE TABLE users (
+    id UUID PRIMARY KEY,
+    username TEXT UNIQUE
+);
+
+CREATE TABLE games (
+    id UUID PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE ratings (
+    user_id UUID,
+    game_id UUID,
+    rating SMALLINT DEFAULT 1000,
+    PRIMARY KEY (user_id, game_id),
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    FOREIGN KEY (game_id) REFERENCES games (id) ON DELETE CASCADE
+)

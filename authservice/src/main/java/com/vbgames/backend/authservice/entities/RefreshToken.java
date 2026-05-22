@@ -40,11 +40,11 @@ public class RefreshToken {
     private User user;
 
     @Column(name = "expires_at")
-    private Long expiresAt;
+    private long expiresAt;
 
     public RefreshToken(String token, User user) {
         this.token = token;
         this.user = user;
-        this.expiresAt = Instant.now().plus(7, ChronoUnit.DAYS).toEpochMilli();
+        this.expiresAt = Instant.now().plus(7, ChronoUnit.SECONDS).toEpochMilli();
     }
 }

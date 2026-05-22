@@ -2,12 +2,12 @@ package com.vbgames.backend.matchservice.repositories;
 
 import java.util.UUID;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.vbgames.backend.matchservice.entities.Game;
 
 @Repository
-public interface GameRepository extends CrudRepository<Game, UUID> {
+public interface GameRepository extends JpaRepository<Game, UUID> {
 
 }

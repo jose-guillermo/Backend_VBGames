@@ -10,12 +10,14 @@ import org.springframework.transaction.annotation.Transactional;
 import com.vbgames.backend.common.enums.ErrorCode;
 import com.vbgames.backend.common.events.ProductPurchasedEvent;
 import com.vbgames.backend.common.events.UserCoinsUpdatedEvent;
+import com.vbgames.backend.common.events.UserConnectedEvent;
 import com.vbgames.backend.common.events.UserCreatedEvent;
-import com.vbgames.backend.common.events.UserStatusChangedEvent;
+import com.vbgames.backend.common.events.UserDisconnectedEvent;
 import com.vbgames.backend.common.events.UsernameUpdatedEvent;
 import com.vbgames.backend.common.exceptions.DuplicateResourceException;
 import com.vbgames.backend.common.exceptions.ResourceNotFoundException;
-import com.vbgames.backend.userservice.dtos.UserResponse;
+import com.vbgames.backend.userservice.dtos.UserPrivateResponse;
+import com.vbgames.backend.userservice.dtos.UserPublicResponse;
 import com.vbgames.backend.userservice.entities.Game;
 import com.vbgames.backend.userservice.entities.Role;
 import com.vbgames.backend.userservice.entities.User;
@@ -37,19 +39,26 @@ public class UserService {
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @Transactional(readOnly = true)
-    public UserResponse getUser(UUID id) {
+    public UserPublicResponse getUser(UUID id) {
         User user = userRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado", ErrorCode.USER_NOT_FOUND));
-        return userMapper.toUserResponse(user);
+        return userMapper.toUserPublicResponse(user);
+    }
+
+    @Transactional(readOnly = true)
+    public UserPrivateResponse getMyUser(UUID id) {
+        User user = userRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado", ErrorCode.USER_NOT_FOUND));
+        return userMapper.toUserPrivateResponse(user);
     }
 
     @Transactional
-    public UserResponse updateUsername(String username, UUID userId) {
+    public UserPublicResponse updateUsername(String username, UUID userId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado", ErrorCode.USER_NOT_FOUND));
         
         if (username.equals(user.getUsername()))
-            return userMapper.toUserResponse(user);
+            return userMapper.toUserPublicResponse(user);
 
         userRepository.findByUsername(username)
             .ifPresent(u -> {
@@ -63,11 +72,11 @@ public class UserService {
 
         sendUserUpdated(user);
 
-        return userMapper.toUserResponse(user);
+        return userMapper.toUserPublicResponse(user);
     }
 
     @Transactional
-    public UserResponse updateFavouriteGame(UUID userId, UUID gameId) {
+    public UserPublicResponse updateFavouriteGame(UUID userId, UUID gameId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado", ErrorCode.USER_NOT_FOUND));
         Game game = gameRepository.findById(gameId)
@@ -75,14 +84,13 @@ public class UserService {
         
         user.setFavouriteGame(game);
 
-        return userMapper.toUserResponse(user);
+        return userMapper.toUserPublicResponse(user);
     }
 
     @KafkaListener(topics = "product.purchased")
     @Transactional
     public void handleProductPurchased(ProductPurchasedEvent event) {
-        User user = userRepository.findById(event.getUserId())
-            .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado para evento", ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.getReferenceById(event.getUserId());
         
         user.setCoins(user.getCoins() - event.getPrice());
         
@@ -100,14 +108,20 @@ public class UserService {
         user.getRoles().add(userRole);
     }
 
-    @KafkaListener(topics = "user.status.changed")
+    @KafkaListener(topics = "user.connected")
     @Transactional
-    public void handleUserStatusChanged(UserStatusChangedEvent event) {
-        User user = userRepository.findById(event.getId())
-            .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado para evento", ErrorCode.USER_NOT_FOUND));
+    public void handleUserConnected(UserConnectedEvent event) {
+        User user = userRepository.getReferenceById(event.getId());
 
-        user.setOnline(event.getOnline());
+        user.setOnline(true);
+    }
 
+    @KafkaListener(topics = "user.diconnected")
+    @Transactional
+    public void handleUserDisconnected(UserDisconnectedEvent event) {
+        User user = userRepository.getReferenceById(event.getId());
+
+        user.setOnline(false);
     }
 
     private void sendUserUpdated(User user) {

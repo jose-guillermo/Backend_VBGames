@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -40,10 +41,13 @@ public class SecurityConfig {
                 .pathMatchers(HttpMethod.PUT,"/games/*").hasRole("ADMIN")
                 .pathMatchers(HttpMethod.POST,"/products/*").hasRole("ADMIN")
 
+                // .pathMatchers("/ws/**").permitAll()
+
                 .anyExchange().authenticated()
             )
             .addFilterAt(new JwtAccessTokenValidationFilter(jwtService), SecurityWebFiltersOrder.AUTHENTICATION)
             .csrf(csrf -> csrf.disable())
+            .cors(Customizer.withDefaults())
             .exceptionHandling(ex -> ex
                 .authenticationEntryPoint((exchange, e) -> {
                     exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
@@ -67,6 +71,7 @@ public class SecurityConfig {
 
             config.setAllowedOrigins(List.of(
                 "http://localhost:4200",
+                "https://localhost:4200",
                 "https://virtual-board-games.web.app"
             ));
             config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));

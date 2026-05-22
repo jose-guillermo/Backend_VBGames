@@ -37,14 +37,14 @@ public class UserService {
     @KafkaListener(topics = "user.username.updated")
     @Transactional
     public void handleUsernameUpdated(UsernameUpdatedEvent event) {
-        User user = userRepository.findById(event.getId()).get();
+        User user = userRepository.getReferenceById(event.getId());
         user.setUsername(event.getUsername());
     }
 
     @KafkaListener(topics = "user.coins.updated")
     @Transactional
     public void handleUserCoinsUpdated(UserCoinsUpdatedEvent event) {
-        User user = userRepository.findById(event.getId()).get();
+        User user = userRepository.getReferenceById(event.getId());
         user.setCoins(event.getCoins());
     }
 

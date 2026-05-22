@@ -1,9 +1,13 @@
 package com.vbgames.backend.matchservice.entities;
 
+import java.util.List;
 import java.util.UUID;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,4 +25,12 @@ public class User {
     @Id
     private UUID id;
     private String username;
+
+    @ManyToMany
+    @JoinTable(
+        name = "favourite_matches",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "match_id")
+    )
+    private List<Match> favouriteMatches;
 }

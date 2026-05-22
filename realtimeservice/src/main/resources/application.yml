@@ -41,7 +41,7 @@ spring:
             key-serializer: org.apache.kafka.common.serialization.StringSerializer
             value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
-logging:
-  level:
-    org.springframework.messaging: DEBUG
-    org.springframework.web.socket: DEBUG
+# logging:
+#   level:
+#     org.springframework.messaging: DEBUG
+#     org.springframework.web.socket: DEBUG

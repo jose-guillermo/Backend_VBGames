@@ -26,7 +26,7 @@ public class User {
     @Id
     private UUID id;
     private String username;
-    private int coins;
+    private int coins = 100;
 
     @ManyToMany
     @JoinTable(

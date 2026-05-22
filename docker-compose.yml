@@ -10,7 +10,7 @@ services:
     volumes:
       - ./init-db:/docker-entrypoint-initdb.d
       - pgdata:/var/lib/postgresql/data
-  
+
   kafka:
     image: apache/kafka:4.0.1
     container_name: kafka
@@ -47,7 +47,7 @@ services:
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka:29092
     networks:
       - kraft-net
-  
+
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     container_name: kafka-ui
@@ -66,6 +66,7 @@ services:
 volumes:
   pgdata:
   kafka-data:
+  redis-data:
 
 networks:
   kraft-net:

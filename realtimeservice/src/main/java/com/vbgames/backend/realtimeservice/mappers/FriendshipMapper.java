@@ -14,7 +14,6 @@ public interface FriendshipMapper{
     @Mapping(target = "id", source = ".", qualifiedByName = "toFriendshipId")
     Friendship toFriendship(FriendshipEvent event);
 
-
     @Named("toFriendshipId")
     default FriendshipId toFriendshipId(FriendshipEvent event) {
         return new FriendshipId(event.getSenderId(), event.getRecipientId());

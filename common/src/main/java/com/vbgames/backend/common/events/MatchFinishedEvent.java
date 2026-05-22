@@ -9,8 +9,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserStatusChangedEvent {
+public class MatchFinishedEvent {
 
-    private UUID id;
-    private Boolean online;
+    private UUID player1Id;
+    private UUID player2Id;
+    private UUID winnerId;
+    private UUID gameId;
+
 }

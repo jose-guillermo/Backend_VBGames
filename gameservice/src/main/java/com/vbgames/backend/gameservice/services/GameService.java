@@ -74,8 +74,6 @@ public class GameService{
 
     private void sendGameEvent(Game game) {
         GameUpsertedEvent gameEvent = gameMapper.toGameEvent(game);
-
-        System.out.println("Sending game event: " + gameEvent);
         kafkaTemplate.send("game.upserted", gameEvent);
     }
 }

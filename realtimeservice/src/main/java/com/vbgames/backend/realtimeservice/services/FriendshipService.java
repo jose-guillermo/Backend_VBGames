@@ -3,7 +3,6 @@ package com.vbgames.backend.realtimeservice.services;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,9 +25,8 @@ public class FriendshipService {
         return new ArrayList<UUID>(friendshipRepository.findAllFriendsByUserId(userId));
     }
 
-    @KafkaListener(topics = "friendship.events")
     @Transactional
-    public void handleFriendshipEvent(FriendshipEvent event) {
+    public void updateFrienship(FriendshipEvent event) {
 
         Friendship friendship = friendshipMapper.toFriendship(event);
 

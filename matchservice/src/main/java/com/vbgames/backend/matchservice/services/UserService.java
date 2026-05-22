@@ -1,15 +1,19 @@
 package com.vbgames.backend.matchservice.services;
 
+import java.util.UUID;
+
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.vbgames.backend.common.enums.ErrorCode;
 import com.vbgames.backend.common.events.UserCreatedEvent;
 import com.vbgames.backend.common.events.UsernameUpdatedEvent;
+import com.vbgames.backend.common.exceptions.ResourceNotFoundException;
 import com.vbgames.backend.matchservice.entities.User;
 import com.vbgames.backend.matchservice.mappers.UserMapper;
 import com.vbgames.backend.matchservice.repositories.UserRepository;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -29,7 +33,19 @@ public class UserService {
     @KafkaListener(topics = "user.username.updated")
     @Transactional
     public void handleUsernameUpdated(UsernameUpdatedEvent event) {
-        User user = userRepository.findById(event.getId()).get();
+        User user = userRepository.getReferenceById(event.getId());
         user.setUsername(event.getUsername());
+    }
+
+    @Transactional(readOnly = true)
+    public User getUserById(UUID id) {
+        System.out.println(id);
+        return userRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado", ErrorCode.USER_NOT_FOUND));
+    }
+
+    @Transactional(readOnly = true)
+    public User getReferenceById(UUID id) {
+        return userRepository.getReferenceById(id);
     }
 }

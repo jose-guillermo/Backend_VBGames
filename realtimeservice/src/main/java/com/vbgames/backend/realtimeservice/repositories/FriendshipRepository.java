@@ -3,8 +3,8 @@ package com.vbgames.backend.realtimeservice.repositories;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -12,7 +12,7 @@ import com.vbgames.backend.realtimeservice.entities.Friendship;
 import com.vbgames.backend.realtimeservice.entities.FriendshipId;
 
 @Repository
-public interface FriendshipRepository extends CrudRepository<Friendship, FriendshipId> {
+public interface FriendshipRepository extends JpaRepository<Friendship, FriendshipId> {
 
     @Query(
         value =  """

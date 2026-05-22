@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Table(name = "roles")
@@ -27,6 +28,7 @@ public class Role {
 
     @ManyToMany(mappedBy = "roles")
     // @JsonIgnoreProperties({"roles", "handler", "hibernateLazyInitializer"})
+    @ToString.Exclude
     private List<User> users;
 
 }

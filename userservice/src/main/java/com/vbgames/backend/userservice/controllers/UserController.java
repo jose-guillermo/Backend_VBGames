@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.vbgames.backend.common.exceptions.RequestValidationException;
 import com.vbgames.backend.common.validators.IsUUID;
 import com.vbgames.backend.userservice.dtos.UpdateUsernameRequest;
-import com.vbgames.backend.userservice.dtos.UserResponse;
+import com.vbgames.backend.userservice.dtos.UserPrivateResponse;
+import com.vbgames.backend.userservice.dtos.UserPublicResponse;
 import com.vbgames.backend.userservice.services.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,8 +41,20 @@ public class UserController {
     )
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public UserResponse getUser(@PathVariable @IsUUID String id) {
+    public UserPublicResponse getUser(@PathVariable @IsUUID String id) {
         return userService.getUser(UUID.fromString(id));
+    }
+
+    @Operation(
+        summary = "Obtener tu propio usuario",
+        description = "Errores posibles:\n" +
+            "- 400 → VALIDATION_ERROR\n" +
+            "- 404 → USER_NOT_FOUND"
+    )
+    @GetMapping("/me")
+    @ResponseStatus(HttpStatus.OK)
+    public UserPrivateResponse getMyUser(@RequestHeader("X-User-Id") UUID userId) {
+        return userService.getMyUser(userId);
     }
 
     @Operation(
@@ -53,7 +66,7 @@ public class UserController {
     )
     @PatchMapping("/favourite-game/{gameIdString}")
     @ResponseStatus(HttpStatus.OK)
-    public UserResponse updateFavouriteGame(
+    public UserPublicResponse updateFavouriteGame(
         @PathVariable @IsUUID String gameIdString,
         @RequestHeader("X-User-Id") UUID userId
     ) {
@@ -71,9 +84,9 @@ public class UserController {
     )
     @PatchMapping("/update-username")
     @ResponseStatus(HttpStatus.OK)
-    public UserResponse updateUsername(
+    public UserPublicResponse updateUsername(
         @Valid @RequestBody UpdateUsernameRequest request, 
-        BindingResult result, 
+        BindingResult result,
         @RequestHeader("X-User-Id") UUID userId
     ) {
         validation(result);

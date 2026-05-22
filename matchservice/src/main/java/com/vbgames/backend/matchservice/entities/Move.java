@@ -1,5 +1,12 @@
 package com.vbgames.backend.matchservice.entities;
 
+import java.util.List;
+
+import com.vbgames.backend.common.dto.Action;
+import com.vbgames.backend.matchservice.converters.ActionListConverter;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -22,11 +29,9 @@ public class Move {
     @EmbeddedId
     private MoveId id;
 
-    private short fromRow;
-    private short fromCol;
-
-    private short toRow;
-    private short toCol;
+    @Convert(converter = ActionListConverter.class)
+    @Column(columnDefinition = "TEXT")
+    private List<Action> actions;
 
     private boolean gameOver;
 

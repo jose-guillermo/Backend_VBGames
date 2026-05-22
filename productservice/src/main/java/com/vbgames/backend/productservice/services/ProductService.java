@@ -35,16 +35,7 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public List<ProductResponse> getProducts(UUID userId) {
-        List<Product> products = (List<Product>) productRepository.findAllWithUsers();
-        
-        // Compruebo si el producto pertenece al usuario
-        return products.stream()
-            .map( product -> {
-                boolean owned = product.getUsers().stream()
-                    .anyMatch(user -> user.getId().equals(userId));
-                return productMapper.toProductResponse(product, owned);
-            })
-            .toList();
+        return productRepository.findAllProductsByUserId(userId);
     }
     
     @Transactional

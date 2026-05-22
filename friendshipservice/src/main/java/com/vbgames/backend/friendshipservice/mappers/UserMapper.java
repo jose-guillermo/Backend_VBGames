@@ -10,12 +10,8 @@ import com.vbgames.backend.friendshipservice.entities.User;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
-    @Mapping(target = "friends", ignore = true)
-    @Mapping(target = "friendOf", ignore = true)
     @Mapping(target = "username", ignore = true)
     User toUser(UserCreatedEvent userEvent);
 
-    @Mapping(target = "friends", ignore = true)
-    @Mapping(target = "friendOf", ignore = true)
     User toUser(UsernameUpdatedEvent userEvent);
 }

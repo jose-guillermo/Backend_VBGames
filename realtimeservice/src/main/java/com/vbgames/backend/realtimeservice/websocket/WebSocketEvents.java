@@ -9,8 +9,8 @@ import org.springframework.web.socket.messaging.AbstractSubProtocolEvent;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
-import com.vbgames.backend.realtimeservice.services.EventService;
-import com.vbgames.backend.realtimeservice.services.RealtimeMessagingService;
+import com.vbgames.backend.realtimeservice.services.EventProducerService;
+import com.vbgames.backend.realtimeservice.services.RealtimeNotificationService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,15 +18,15 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class WebSocketEvents {
 
-    private final EventService eventService;
-    private final RealtimeMessagingService realtimeMessagingService;
+    private final EventProducerService eventProducerService;
+    private final RealtimeNotificationService realtimeNotificationService;
 
     @EventListener
     public void handleConnect(SessionConnectEvent  event) {
         String userId = getUserId(event);
         System.out.println("User connected: " + userId);
-        eventService.sendUserStatusChanged(userId, true);
-        realtimeMessagingService.notifyFriendsOnline(UUID.fromString(userId));
+        eventProducerService.sendUserConnected(userId);
+        realtimeNotificationService.notifyFriendsOnline(UUID.fromString(userId));
     }
 
     @EventListener
@@ -34,7 +34,7 @@ public class WebSocketEvents {
         String userId = getUserId(event);
         System.out.println("User disconnected: " + userId);
 
-        eventService.sendUserStatusChanged(userId, false);
+        eventProducerService.sendUserDisconnected(userId);
     }
 
     private String getUserId(AbstractSubProtocolEvent event) {

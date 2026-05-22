@@ -11,7 +11,9 @@ import com.vbgames.backend.matchservice.entities.User;
 public interface UserMapper {
 
     @Mapping(target = "username", ignore = true)
+    @Mapping(target = "favouriteMatches", ignore = true)
     User toUser(UserCreatedEvent event);
 
+    @Mapping(target = "favouriteMatches", ignore = true)
     User toUser(UsernameUpdatedEvent event);
 }
